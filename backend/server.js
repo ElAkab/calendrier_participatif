@@ -66,6 +66,22 @@ app.get("/all", (req, res) => {
 	res.json(result);
 });
 
+// --- AJOUT DE CETTE ROUTE POUR TESTER LA RÉCEPTION DE DONNÉES ---
+
+app.get("/api/dates", (req, res) => {
+	console.log("GET /api/dates demandé");
+
+	// Pour test, on renvoie simplement les dates de tous les participants
+	const dates = participants.map((p) => ({
+		userName: p.userName,
+		selectedDates: p.selectedDates,
+	}));
+
+	console.log("Dates envoyées :", dates);
+
+	res.json(dates);
+});
+
 app.delete("/clear", (req, res) => {
 	console.log("DELETE /clear reçu, suppression des données");
 	participants.length = 0;
