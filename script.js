@@ -451,6 +451,7 @@ navs.forEach((nav) => {
 });
 
 // Gestion du bouton de validation
+// Gestion du bouton de validation
 validateBtn?.addEventListener("click", () => {
 	if (isRedirecting) return;
 	if (selectedDates.length === 0) {
@@ -501,16 +502,8 @@ validateBtn?.addEventListener("click", () => {
 			return res.json();
 		})
 		.then((data) => {
-			const dateCounts = {};
-			data.forEach((userEntry) => {
-				userEntry.selectedDates.forEach((date) => {
-					dateCounts[date] = (dateCounts[date] || 0) + 1;
-				});
-			});
-
-			const popularDates = Object.entries(dateCounts)
-				.filter(([date, count]) => count >= 2)
-				.map(([date]) => date);
+			// ✅ Utilisation directe des dates populaires depuis le backend
+			const popularDates = data[0]?.popularDates || [];
 
 			localStorage.setItem("popularDates", JSON.stringify(popularDates));
 
