@@ -29,47 +29,54 @@
 
 			const list = document.getElementById("results");
 
-			// Chargement des résultats + mise en évidence des dates populaires
-			fetch(`${BASE_URL}/all`)
-				.then((res) => res.json())
-				.then((data) => {
-					if (data.length === 0) {
-						list.innerHTML = "<li>Aucun participant trouvé.</li>";
-						return;
-					}
+			// ✅ Factorisation dans une fonction pour pouvoir la rappeler
+			function loadResults() {
+				list.innerHTML = ""; // Vide la liste avant d'ajouter les nouvelles données
 
-					// Affichage des participants et mise en évidence des dates communes à tous
-					data.forEach((entry) => {
-						const li = document.createElement("li");
+				fetch(`${BASE_URL}/all`)
+					.then((res) => res.json())
+					.then((data) => {
+						if (data.length === 0) {
+							list.innerHTML = "<li>Aucun participant trouvé.</li>";
+							return;
+						}
 
-						const formattedDates = entry.selectedDates.map((dateStr) => {
-							const parts = dateStr.split("-");
-							const formatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+						data.forEach((entry) => {
+							const li = document.createElement("li");
 
-							// ✅ Si cette date fait partie des popularDates du participant, on la met en évidence
-							if (entry.popularDates.includes(dateStr)) {
-								return `<span style="color: green; font-weight: bold;">${formatted}</span>`;
-							}
-							return formatted;
+							const formattedDates = entry.selectedDates.map((dateStr) => {
+								const parts = dateStr.split("-");
+								const formatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+
+								if (entry.popularDates.includes(dateStr)) {
+									return `<span style="color: green; font-weight: bold;">${formatted}</span>`;
+								}
+								return formatted;
+							});
+
+							li.innerHTML = `${entry.userName} → ${formattedDates.join(
+								" | "
+							)}`;
+							list.appendChild(li);
 						});
-
-						li.innerHTML = `${entry.userName} → ${formattedDates.join(" | ")}`;
-						list.appendChild(li);
+					})
+					.catch((err) => {
+						console.error("Erreur :", err);
+						list.innerHTML = "<li>Erreur lors du chargement des données.</li>";
 					});
-				})
-				.catch((err) => {
-					console.error("Erreur :", err);
-					list.innerHTML = "<li>Erreur lors du chargement des données.</li>";
-				});
+			}
 
-			// Bouton "Clear" pour effacer toutes les données serveur
+			// 🔁 Chargement initial
+			loadResults();
+
+			// 🔁 Réinitialisation avec rechargement
 			document.getElementById("clear").addEventListener("click", () => {
 				if (confirm("Supprimer toutes les données du serveur ?")) {
 					fetch(`${BASE_URL}/clear`, { method: "DELETE" })
 						.then((res) => {
 							if (res.ok) {
 								alert("Données supprimées !");
-								list.innerHTML = "<li>Liste vide.</li>";
+								loadResults(); // 👈 recharge proprement après suppression
 							} else {
 								alert("Erreur serveur");
 							}
