@@ -110,7 +110,7 @@ app.delete("/delete-user/:userName", (req, res) => {
 	res.json({ message: "Utilisateur supprimé avec succès." });
 });
 
-app.get("/All", (req, res) => {
+app.get("/all", (req, res) => {
 	res.sendFile(path.join(__dirname, "..", "resultats.html"));
 });
 
