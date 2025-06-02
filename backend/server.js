@@ -112,7 +112,7 @@ app.delete("/delete-user/:userName", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-	res.send("Le backend fonctionne !");
+	res.send("Bienvenue sur le serveur backend ! 🎉");
 });
 
 app.listen(PORT, () => {
