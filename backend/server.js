@@ -111,10 +111,10 @@ app.delete("/delete-user/:userName", (req, res) => {
 	res.json({ message: "Utilisateur supprimé avec succès." });
 });
 
-app.use(express.static(path.join(__dirname, "../")));
+app.use(express.static(path.join(__dirname, "..")));
 
 app.get("/", (req, res) => {
-	res.sendFile(path.join(__dirname, "../index.html"));
+	res.sendFile(path.join(__dirname, "..", "index.html"));
 });
 
 app.listen(PORT, () => {
