@@ -7,12 +7,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const participants = [];
+const votesByDate = {}; // Nouveau : stocke les noms par date (ex: "2025-06-05": ["Alice", "Bob"])
 
 app.use(cors());
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, "..")));
 
+// --- Enregistrement des dates ---
 app.post("/submit-dates", (req, res) => {
 	const { userName, selectedDates } = req.body;
 	console.log("POST /submit-dates reçu :", { userName, selectedDates });
@@ -22,9 +24,20 @@ app.post("/submit-dates", (req, res) => {
 		return res.status(400).json({ message: "Données invalides." });
 	}
 
-	// Vérifie si l'utilisateur existe déjà
-	const existingIndex = participants.findIndex((p) => p.userName === userName);
+	// Supprimer les anciennes dates de votesByDate
+	Object.keys(votesByDate).forEach((date) => {
+		votesByDate[date] = votesByDate[date].filter((name) => name !== userName);
+		if (votesByDate[date].length === 0) delete votesByDate[date];
+	});
 
+	// Ajouter les nouvelles
+	selectedDates.forEach((date) => {
+		if (!votesByDate[date]) votesByDate[date] = [];
+		if (!votesByDate[date].includes(userName)) votesByDate[date].push(userName);
+	});
+
+	// Mise à jour du tableau des participants
+	const existingIndex = participants.findIndex((p) => p.userName === userName);
 	if (existingIndex !== -1) {
 		participants[existingIndex].selectedDates = selectedDates;
 		console.log(`Mise à jour des dates pour ${userName}`);
@@ -34,10 +47,10 @@ app.post("/submit-dates", (req, res) => {
 	}
 
 	console.log("Participants actuels :", participants);
-
 	res.status(200).json({ message: "Données bien reçues !" });
 });
 
+// --- Récupération des données ---
 app.get("/all", (req, res) => {
 	console.log("GET /all demandé");
 
@@ -61,29 +74,25 @@ app.get("/all", (req, res) => {
 	}));
 
 	console.log("Renvoi des données :", result);
-
 	res.json(result);
 });
 
-// --- AJOUT DE CETTE ROUTE POUR TESTER LA RÉCEPTION DE DONNÉES ---
-
+// --- Récupération brute des dates (pour debug/test) ---
 app.get("/api/dates", (req, res) => {
 	console.log("GET /api/dates demandé");
-
-	// Pour test, on renvoie simplement les dates de tous les participants
 	const dates = participants.map((p) => ({
 		userName: p.userName,
 		selectedDates: p.selectedDates,
 	}));
-
 	console.log("Dates envoyées :", dates);
-
 	res.json(dates);
 });
 
+// --- Réinitialisation totale ---
 app.delete("/clear", (req, res) => {
 	console.log("DELETE /clear reçu, suppression des données");
 	participants.length = 0;
+	for (const key in votesByDate) delete votesByDate[key];
 
 	fs.writeFile("data.json", "[]", (err) => {
 		if (err) {
@@ -95,6 +104,7 @@ app.delete("/clear", (req, res) => {
 	});
 });
 
+// --- Suppression d'un participant par prénom ---
 app.delete("/delete-user/:userName", (req, res) => {
 	const userName = req.params.userName;
 	console.log(`DELETE /delete-user/${userName} demandé`);
@@ -105,11 +115,20 @@ app.delete("/delete-user/:userName", (req, res) => {
 		return res.status(404).json({ message: "Utilisateur introuvable." });
 	}
 
+	// Supprime du tableau principal
 	participants.splice(index, 1);
+
+	// Supprime des votes par date
+	Object.keys(votesByDate).forEach((date) => {
+		votesByDate[date] = votesByDate[date].filter((name) => name !== userName);
+		if (votesByDate[date].length === 0) delete votesByDate[date];
+	});
+
 	console.log(`Utilisateur supprimé : ${userName}`);
 	res.json({ message: "Utilisateur supprimé avec succès." });
 });
 
+// --- Routes statiques ---
 app.get("/all", (req, res) => {
 	res.sendFile(path.join(__dirname, "..", "resultats.html"));
 });
@@ -118,6 +137,7 @@ app.get("/resultats.html", (req, res) => {
 	res.sendFile(path.join(__dirname, "..", "resultats.html"));
 });
 
+// --- Lancement ---
 app.listen(PORT, () => {
 	console.log(`Serveur démarré sur le port ${PORT}`);
 });

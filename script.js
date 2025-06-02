@@ -122,8 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 
 		if (!isAllowedName(name)) {
-			nameMessage.textContent =
-				"Ce prénom n'est pas reconnu. Merci d'en saisir un figurant dans la liste.";
+			nameMessage.textContent = "Ce prénom n'est pas reconnu.";
 			input.classList.add("invalid");
 			alert("Connais pas...");
 			return;
