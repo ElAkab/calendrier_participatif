@@ -111,6 +111,10 @@ app.delete("/delete-user/:userName", (req, res) => {
 	res.json({ message: "Utilisateur supprimé avec succès." });
 });
 
+app.get("/", (req, res) => {
+	res.send("Le backend fonctionne !");
+});
+
 app.listen(PORT, () => {
 	console.log(`Serveur démarré sur le port ${PORT}`);
 });
