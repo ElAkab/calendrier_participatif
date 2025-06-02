@@ -11,8 +11,7 @@ const participants = [];
 app.use(cors());
 app.use(express.json());
 
-// Servir frontend
-app.use(express.static(path.join(__dirname, "../frontend")));
+app.use(express.static(path.join(__dirname, "..")));
 
 app.post("/submit-dates", (req, res) => {
 	const { userName, selectedDates } = req.body;
@@ -111,9 +110,11 @@ app.delete("/delete-user/:userName", (req, res) => {
 	res.json({ message: "Utilisateur supprimé avec succès." });
 });
 
-app.use(express.static(path.join(__dirname, "..")));
+app.get("/All", (req, res) => {
+	res.sendFile(path.join(__dirname, "..", "resultats.html"));
+});
 
-app.get("/", (req, res) => {
+app.get("/resultats.html", (req, res) => {
 	res.sendFile(path.join(__dirname, "..", "resultats.html"));
 });
 
