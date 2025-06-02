@@ -4,31 +4,34 @@ const path = require("path");
 const fs = require("fs");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 const participants = [];
 
 app.use(cors());
 app.use(express.json());
 
+// Servir frontend
 app.use(express.static(path.join(__dirname, "../frontend")));
 
 app.post("/submit-dates", (req, res) => {
 	const { userName, selectedDates } = req.body;
+	console.log("POST /submit-dates reçu :", { userName, selectedDates });
 
 	if (!userName || !selectedDates || !Array.isArray(selectedDates)) {
+		console.log("Données invalides reçues.");
 		return res.status(400).json({ message: "Données invalides." });
 	}
 
-	// 🔍 Vérifie si l'utilisateur existe déjà
+	// Vérifie si l'utilisateur existe déjà
 	const existingIndex = participants.findIndex((p) => p.userName === userName);
 
 	if (existingIndex !== -1) {
-		// ✏️ Met à jour ses dates
 		participants[existingIndex].selectedDates = selectedDates;
+		console.log(`Mise à jour des dates pour ${userName}`);
 	} else {
-		// ➕ Sinon, ajoute-le
 		participants.push({ userName, selectedDates });
+		console.log(`Nouvel utilisateur ajouté : ${userName}`);
 	}
 
 	console.log("Participants actuels :", participants);
@@ -37,6 +40,8 @@ app.post("/submit-dates", (req, res) => {
 });
 
 app.get("/all", (req, res) => {
+	console.log("GET /all demandé");
+
 	// Calcul des fréquences
 	const dateCounts = {};
 	participants.forEach((p) => {
@@ -45,23 +50,24 @@ app.get("/all", (req, res) => {
 		});
 	});
 
-	// Liste des dates populaires (choisies par au moins 2 personnes)
 	const totalParticipants = participants.length;
 	const popularDates = Object.keys(dateCounts).filter(
-		(date) => dateCounts[date] === totalParticipants
+		(date) => dateCounts[date] === totalParticipants && totalParticipants > 1
 	);
 
-	// On ajoute à chaque participant une liste de ses dates populaires
 	const result = participants.map((p) => ({
 		userName: p.userName,
 		selectedDates: p.selectedDates,
 		popularDates: p.selectedDates.filter((date) => popularDates.includes(date)),
 	}));
 
+	console.log("Renvoi des données :", result);
+
 	res.json(result);
 });
 
 app.delete("/clear", (req, res) => {
+	console.log("DELETE /clear reçu, suppression des données");
 	participants.length = 0;
 
 	fs.writeFile("data.json", "[]", (err) => {
@@ -69,15 +75,18 @@ app.delete("/clear", (req, res) => {
 			console.error("Erreur suppression :", err);
 			return res.status(500).send("Erreur serveur");
 		}
+		console.log("Données supprimées avec succès");
 		res.send("Données supprimées");
 	});
 });
 
 app.delete("/delete-user/:userName", (req, res) => {
 	const userName = req.params.userName;
+	console.log(`DELETE /delete-user/${userName} demandé`);
 
 	const index = participants.findIndex((p) => p.userName === userName);
 	if (index === -1) {
+		console.log(`Utilisateur introuvable : ${userName}`);
 		return res.status(404).json({ message: "Utilisateur introuvable." });
 	}
 
@@ -87,5 +96,5 @@ app.delete("/delete-user/:userName", (req, res) => {
 });
 
 app.listen(PORT, () => {
-	console.log(`Serveur en écoute sur http://localhost:${PORT}`);
+	console.log(`Serveur démarré sur le port ${PORT}`);
 });

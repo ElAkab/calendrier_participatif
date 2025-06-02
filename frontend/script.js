@@ -1,5 +1,10 @@
 console.log("JS chargé");
 
+const BASE_URL =
+	window.location.hostname === "localhost"
+		? "http://localhost:3000"
+		: "https://calendrier-participatif.onrender.com";
+
 function safeParseJSON(raw) {
 	try {
 		return JSON.parse(raw) || [];
@@ -147,14 +152,10 @@ document.addEventListener("DOMContentLoaded", () => {
 	resetBtn.addEventListener("click", () => {
 		const userName = localStorage.getItem("userName");
 
-		// Supprimer l'utilisateur côté serveur s'il existe
 		if (userName) {
-			fetch(
-				`http://localhost:3000/delete-user/${encodeURIComponent(userName)}`,
-				{
-					method: "DELETE",
-				}
-			)
+			fetch(`${BASE_URL}/delete-user/${encodeURIComponent(userName)}`, {
+				method: "DELETE",
+			})
 				.then((res) => {
 					if (!res.ok) throw new Error("Erreur serveur");
 					console.log(`Utilisateur ${userName} supprimé du serveur.`);
@@ -164,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				});
 		}
 
-		// ⚙️ Ton code existant reste inchangé
+		// Le reste de ton code...
 		localStorage.removeItem("allUserNames");
 		localStorage.removeItem("userName");
 		localStorage.removeItem("selectedDates");
@@ -476,7 +477,7 @@ validateBtn?.addEventListener("click", () => {
 	const userName = localStorage.getItem("userName");
 	saveDatesForUser(userName, selectedDates);
 
-	fetch("http://localhost:3000/submit-dates", {
+	fetch(`${BASE_URL}/submit-dates`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
@@ -492,37 +493,44 @@ validateBtn?.addEventListener("click", () => {
 			output.textContent = "Chargement des statistiques...";
 
 			localStorage.setItem("selectedDates", JSON.stringify(selectedDates));
-			// Récupérer tous les votes pour analyser les dates populaires
-			fetch("http://localhost:3000/all")
-				.then((res) => res.json())
-				.then((data) => {
-					const dateCounts = {};
-					data.forEach((userEntry) => {
-						userEntry.selectedDates.forEach((date) => {
-							dateCounts[date] = (dateCounts[date] || 0) + 1;
-						});
-					});
 
-					// Extraire les dates populaires (choisies par au moins 2 personnes)
-					const popularDates = Object.entries(dateCounts)
-						.filter(([date, count]) => count >= 2)
-						.map(([date]) => date);
-
-					// Enregistrer dans localStorage pour la page résultats
-					localStorage.setItem("popularDates", JSON.stringify(popularDates));
-
-					output.textContent = "Redirection en cours...";
-					setTimeout(() => {
-						window.location.href = "confirmation/confirmation.html";
-					}, 1000);
-				})
-				.catch((err) => {
-					console.error("Erreur lors du chargement des stats :", err);
-					output.textContent = "Redirection en cours...";
-					setTimeout(() => {
-						window.location.href = "confirmation/confirmation.html";
-					}, 1000);
+			return fetch(`${BASE_URL}/all`);
+		})
+		.then((res) => {
+			if (!res.ok) throw new Error("Erreur lors du chargement des données");
+			return res.json();
+		})
+		.then((data) => {
+			const dateCounts = {};
+			data.forEach((userEntry) => {
+				userEntry.selectedDates.forEach((date) => {
+					dateCounts[date] = (dateCounts[date] || 0) + 1;
 				});
+			});
+
+			const popularDates = Object.entries(dateCounts)
+				.filter(([date, count]) => count >= 2)
+				.map(([date]) => date);
+
+			localStorage.setItem("popularDates", JSON.stringify(popularDates));
+
+			output.textContent = "Redirection en cours...";
+			setTimeout(() => {
+				window.location.href = "confirmation/confirmation.html";
+			}, 1000);
+		})
+		.catch((err) => {
+			console.error("Erreur lors de la communication avec le serveur :", err);
+			output.textContent =
+				"Erreur lors de la communication avec le serveur. Veuillez réessayer.";
+
+			validateBtn.disabled = false;
+			validateBtn.style.cursor = "pointer";
+
+			validateLabel.style.pointerEvents = "auto";
+			validateLabel.style.cursor = "pointer";
+
+			isRedirecting = false;
 		});
 });
 

@@ -22,10 +22,15 @@
 				document.body.innerHTML = ""; // Vide la page
 			}
 
+			const BASE_URL =
+				window.location.hostname === "localhost"
+					? "http://localhost:3000"
+					: "https://calendrier-participatif.onrender.com";
+
 			const list = document.getElementById("results");
 
 			// Chargement des résultats + mise en évidence des dates populaires
-			fetch("http://localhost:3000/all")
+			fetch(`${BASE_URL}/all`)
 				.then((res) => res.json())
 				.then((data) => {
 					if (data.length === 0) {
@@ -60,7 +65,7 @@
 			// Bouton "Clear" pour effacer toutes les données serveur
 			document.getElementById("clear").addEventListener("click", () => {
 				if (confirm("Supprimer toutes les données du serveur ?")) {
-					fetch("http://localhost:3000/clear", { method: "DELETE" })
+					fetch(`${BASE_URL}/clear`, { method: "DELETE" })
 						.then((res) => {
 							if (res.ok) {
 								alert("Données supprimées !");
