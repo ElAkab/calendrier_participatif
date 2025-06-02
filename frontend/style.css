@@ -1,0 +1,386 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+body {
+	height: 100vh;
+	background: linear-gradient(135deg, #ffd3a5, #fd6585);
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+}
+
+/* Modale prénom */
+#welcomeModal {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.6);
+	justify-content: center;
+	align-items: center;
+	z-index: 9999;
+}
+
+#welcomeModal.active {
+	display: flex;
+}
+
+#welcomeModal .modal-content {
+	background: white;
+	padding: 1.5rem;
+	border-radius: 10px;
+	max-width: 320px;
+	width: 90%;
+	text-align: center;
+}
+
+#welcomeModal input[type="text"] {
+	padding: 10px;
+	font-size: 1rem;
+	width: 100%;
+	margin-bottom: 1rem;
+	border-radius: 5px;
+	border: 1px solid #ccc;
+}
+
+#welcomeModal button,
+#resetNamesBtn {
+	padding: 10px 20px;
+	background: #4c9dd9;
+	border: none;
+	color: white;
+	font-size: 1rem;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+#resetNamesBtn {
+	justify-content: end;
+	margin-top: 15px;
+	background-color: #931b0d;
+	transition: 0.2s;
+}
+
+#resetNamesBtn:hover {
+	transform: scale(95%);
+}
+
+#resetNamesBtn:active {
+	transform: scale(95%);
+}
+
+#welcomeModal .modal-content p {
+	margin: 5px 0 5px 0;
+}
+
+.talking-wheel {
+	width: 80px;
+	margin: 0 auto;
+	padding: 10px;
+	display: block;
+	border-radius: 50%;
+	transform: rotate(5deg);
+	animation: bounce 2s infinite ease-in-out;
+}
+
+@keyframes bounce {
+	0%,
+	100% {
+		transform: rotate(5deg) translateY(0);
+	}
+	50% {
+		transform: rotate(5deg) translateY(-5px);
+	}
+}
+
+h1 {
+	color: rgba(255, 255, 255, 0.9);
+	font-style: italic;
+	font-weight: 700;
+	font-size: 2.2rem;
+	text-shadow: 2px 2px 5px rgba(253, 101, 133, 0.7),
+		0 0 10px rgba(255, 211, 165, 0.8);
+	margin-bottom: 20px;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+
+	/* Ajouts pour centrer et empêcher le retour à la ligne */
+	text-align: center; /* Centre horizontalement */
+	white-space: nowrap; /* Empêche le retour à la ligne */
+	overflow: hidden; /* Coupe si trop long */
+	max-width: 100%; /* Pour que ça respecte la largeur parent */
+}
+
+.calendar {
+	margin: 0 auto;
+	width: clamp(320px, 400px, 90%);
+	padding: 1rem;
+	background: #fff;
+	border-radius: 10px;
+	box-shadow: 16px 15px 15px 2px rgba(0, 0, 0, 0.5);
+}
+
+.calendar header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.calendar nav {
+	display: flex;
+	align-items: center;
+}
+
+.calendar ul {
+	list-style: none;
+	display: flex;
+	flex-wrap: wrap;
+	text-align: center;
+}
+
+.calendar ul li {
+	width: calc(100% / 7);
+	position: relative;
+	z-index: 2;
+	aspect-ratio: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	transition: 0.2s;
+}
+
+.calendar ul.dates li:hover {
+	/* background: #777777;
+	color: #ccc; */
+	cursor: pointer;
+}
+
+.calendar ul.dates li:active {
+	background: #000000;
+	color: #ccc;
+	cursor: pointer;
+}
+
+#prev,
+#next {
+	width: 20px;
+	height: 20px;
+	position: relative;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+}
+
+#prev::before,
+#next::before {
+	content: "";
+	width: 50%;
+	height: 50%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	border-style: solid;
+	border-width: 0.25em 0.25em 0 0;
+	border-color: #ccc;
+	transition: 0.2s;
+}
+
+#next::before {
+	transform: translate(-50%, -50%) rotate(45deg);
+}
+
+#prev::before {
+	transform: translate(-50%, -50%) rotate(-135deg);
+}
+
+#prev:hover::before,
+#next:hover::before {
+	border-color: #000;
+}
+
+.days {
+	font-weight: 600;
+}
+
+.days li.today {
+	color: #fff;
+}
+
+.days li.today::before {
+	content: "";
+	width: 2rem;
+	height: 2rem;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: #000;
+	border-radius: 50%;
+	z-index: 1;
+}
+
+.calendar .dates {
+	position: relative;
+	transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.calendar .dates.fade-out {
+	opacity: 0;
+	transform: translateY(10px);
+	pointer-events: none;
+}
+
+.calendar .dates.fade-in {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.days li.inactive {
+	color: #ccc;
+}
+
+.validation-wrapper {
+	display: flex;
+	justify-content: center;
+	margin-top: 30px;
+}
+
+.validate-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #000;
+	color: #fff;
+	padding: 12px 20px;
+	border-radius: 15px;
+	font-size: 1rem;
+	cursor: pointer;
+	overflow: hidden;
+	white-space: nowrap;
+	width: 120px;
+	transition: width 0.6s ease, padding 0.6s ease;
+}
+
+#trigger:checked + .validate-button {
+	width: 50px;
+	padding: 12px;
+}
+
+.text {
+	display: inline-block;
+	transition: opacity 0.5s ease, transform 0.6s ease;
+}
+
+#trigger:checked + .validate-button .text {
+	opacity: 0;
+	transform: translateX(-10px) scaleX(0);
+	width: 0;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+.wheel {
+	width: 0px;
+	opacity: 0;
+	margin-left: 0;
+	transition: all 0.6s ease;
+}
+
+#trigger:checked + .validate-button .wheel {
+	width: 30px;
+	opacity: 1;
+	animation: spin 1s linear infinite;
+}
+
+/* Spin */
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/* .error-message */
+/* input.invalid */
+
+.inactive,
+.today {
+	color: #aaa;
+	pointer-events: none; /* Interdiction de cliquer */
+}
+
+.today {
+	background-color: black;
+	color: white;
+	border-radius: 50%;
+}
+
+.selected {
+	background-color: #007bff;
+	color: white;
+	border-radius: 50%;
+}
+
+button.disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.error-message {
+	display: none;
+	color: #e74c3c;
+	font-size: 0.9em;
+	margin-top: 5px;
+	min-height: 1.2em;
+	text-align: center;
+	transition: all 0.3s;
+}
+
+input.invalid {
+	border: 2px solid #e74c3c;
+	background-color: #fff5f5;
+}
+
+#output {
+	margin-top: 10px;
+	color: #333;
+	font-weight: 700;
+	fill-opacity: calc(0.8 + 0.2 * var(--i));
+	border-radius: 8px;
+	padding: 0.5rem 1rem;
+	box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.2);
+	display: inline-block;
+	transition: background-color 0.3s, color 0.3s;
+	overflow: hidden;
+	max-width: 90vw;
+	white-space: nowrap;
+	opacity: 0.9; /* corrigé : opacity va de 0 à 1 */
+	backdrop-filter: blur(5px);
+	-webkit-backdrop-filter: blur(5px);
+	border: 2px solid rgba(255, 255, 255, 0.2);
+
+	/* Ajouts pour rester à l'écran */
+	position: fixed; /* position fixe par rapport à la fenêtre */
+	bottom: 20px; /* place en bas avec un peu de marge */
+	left: 50%; /* centré horizontalement */
+	transform: translateX(-50%);
+	z-index: 9999; /* au-dessus de tout */
+}
+
+.dates li.popular {
+	background-color: #4caf50;
+	color: white;
+	font-weight: bold;
+	border-radius: 5px;
+}

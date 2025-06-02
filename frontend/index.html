@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Calendrier interactif</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<!-- Modale prénom -->
+		<div id="welcomeModal">
+			<div class="modal-content">
+				<img
+					src="./image/Akab_detoured.png"
+					alt="Moi qui parle"
+					class="talking-wheel"
+				/>
+				<p>Ton prénom suffit !</p>
+				<input type="text" id="userNameInput" />
+				<button id="submitNameBtn">Valider</button>
+				<p id="nameMessage" class="error-message"></p>
+			</div>
+		</div>
+
+		<h1>Choisissez vos dates</h1>
+		<div class="calendar">
+			<header>
+				<button id="prev" aria-label="Mois précédent"></button>
+				<h3></h3>
+				<button id="next" aria-label="Mois suivant"></button>
+			</header>
+			<section>
+				<ul class="days">
+					<li>Lun</li>
+					<li>Mar</li>
+					<li>Mer</li>
+					<li>Jeu</li>
+					<li>Ven</li>
+					<li>Sam</li>
+					<li>Dim</li>
+				</ul>
+			</section>
+			<hr />
+			<ul class="dates"></ul>
+		</div>
+
+		<!-- Bouton validation visible -->
+		<div class="validation-wrapper">
+			<input type="checkbox" id="trigger" hidden />
+			<label for="trigger" class="validate-button">
+				<span class="text">Valider</span>
+				<img
+					src="./image/Akab_original_logo-(backround removed).png"
+					alt="Roue"
+					class="wheel"
+				/>
+			</label>
+		</div>
+
+		<!-- Bouton validation caché mais accessible au script -->
+		<button
+			id="validate-dates"
+			style="position: absolute; left: -9999px; top: -9999px"
+		>
+			Valider mes dates
+		</button>
+		<button id="resetNamesBtn">Oublier</button>
+
+		<div id="output"></div>
+
+		<script src="script.js"></script>
+	</body>
+</html>

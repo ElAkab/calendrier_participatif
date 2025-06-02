@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Résultats</title>
+		<style>
+			body {
+				background: #000;
+				color: #ccc;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Liste des participants</h1>
+		<ul id="results"></ul>
+		<button id="clear">Réinitialiser</button>
+
+		<script>
+			// Protection simple avec mot de passe admin
+			if (prompt("Mot de passe admin :") !== "mdpSecret") {
+				alert("Accès refusé");
+				document.body.innerHTML = ""; // Vide la page
+			}
+
+			const list = document.getElementById("results");
+
+			// Chargement des résultats + mise en évidence des dates populaires
+			fetch("http://localhost:3000/all")
+				.then((res) => res.json())
+				.then((data) => {
+					if (data.length === 0) {
+						list.innerHTML = "<li>Aucun participant trouvé.</li>";
+						return;
+					}
+
+					// Affichage des participants et mise en évidence des dates communes à tous
+					data.forEach((entry) => {
+						const li = document.createElement("li");
+
+						const formattedDates = entry.selectedDates.map((dateStr) => {
+							const parts = dateStr.split("-");
+							const formatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+
+							// ✅ Si cette date fait partie des popularDates du participant, on la met en évidence
+							if (entry.popularDates.includes(dateStr)) {
+								return `<span style="color: green; font-weight: bold;">${formatted}</span>`;
+							}
+							return formatted;
+						});
+
+						li.innerHTML = `${entry.userName} → ${formattedDates.join(" | ")}`;
+						list.appendChild(li);
+					});
+				})
+				.catch((err) => {
+					console.error("Erreur :", err);
+					list.innerHTML = "<li>Erreur lors du chargement des données.</li>";
+				});
+
+			// Bouton "Clear" pour effacer toutes les données serveur
+			document.getElementById("clear").addEventListener("click", () => {
+				if (confirm("Supprimer toutes les données du serveur ?")) {
+					fetch("http://localhost:3000/clear", { method: "DELETE" })
+						.then((res) => {
+							if (res.ok) {
+								alert("Données supprimées !");
+								list.innerHTML = "<li>Liste vide.</li>";
+							} else {
+								alert("Erreur serveur");
+							}
+						})
+						.catch((err) => {
+							console.error(err);
+							alert("Erreur de connexion au serveur.");
+						});
+				}
+			});
+		</script>
+	</body>
+</html>
