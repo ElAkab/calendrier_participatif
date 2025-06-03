@@ -174,6 +174,10 @@ app.delete("/delete-user/:userName", async (req, res) => {
 	res.json({ message: "Utilisateur supprimé avec succès." });
 });
 
+app.get("/", (req, res) => {
+	res.send("Bienvenue sur l'API du calendrier participatif !");
+});
+
 // --- Routes statiques pour fichiers front ---
 app.get("/", (req, res) => {
 	res.sendFile(path.join(__dirname, "..", "index.html"));
