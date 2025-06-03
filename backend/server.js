@@ -27,6 +27,8 @@ console.log(
 	"Chemin des fichiers statiques :",
 	path.join(__dirname, "..", "Résultats_public")
 );
+
+app.use(express.static(path.join(__dirname, "..")));
 app.use(express.static(path.join(__dirname, "..", "Résultats_public")));
 
 // Route pour index.html à la racine
