@@ -1,0 +1,10 @@
+# Forcer LF sur les fichiers texte (JS, HTML, CSS, JSON, etc.)
+*.js text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.json text eol=lf
+
+# Pour les fichiers binaires, pas de conversion
+*.png binary
+*.jpg binary
+*.zip binary
