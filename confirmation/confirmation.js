@@ -1,9 +1,11 @@
 const datesList = document.getElementById("datesList");
 const savedDates = JSON.parse(localStorage.getItem("selectedDates")) || [];
 
+// Affichage des dates sélectionnées
 if (savedDates.length === 0) {
 	datesList.innerHTML = "<li>Aucune date sélectionnée.</li>";
 } else {
+	// Affichage des dates formatées
 	savedDates.forEach((date) => {
 		const li = document.createElement("li");
 		// Split and format date: Jour/mois/année

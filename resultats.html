@@ -70,7 +70,8 @@
 					})
 					.catch((err) => {
 						console.error("Erreur :", err);
-						list.innerHTML = "<li>Erreur lors du chargement des données.</li>";
+						list.innerHTML =
+							"<li>Erreur lors du chargement des données.</li>" + err;
 					});
 			}
 
