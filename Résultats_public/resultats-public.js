@@ -56,6 +56,8 @@ fetch(`${BASE_URL}/votes`)
 			resultList.innerHTML =
 				"<li>Y a rien ici... comme dans mon estomac d'ailleurs...<br>À toi de remplir !<br><small><em>(Pas mon estomac, mais après si tu veux m'offrir à manger, sache que j'aime ...)</em></small></li>";
 			return;
+		} else {
+			document.querySelector("span").style.display = "none";
 		}
 
 		// Calcul des votes par date
