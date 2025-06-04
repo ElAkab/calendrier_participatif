@@ -44,27 +44,31 @@
 			<ul class="dates"></ul>
 		</div>
 
-		<!-- Bouton validation visible -->
-		<div class="validation-wrapper">
-			<input type="checkbox" id="trigger" hidden />
-			<label for="trigger" class="validate-button">
-				<span class="text">Valider</span>
-				<img
-					src="./image/Akab_original_logo-(backround removed).png"
-					alt="Roue"
-					class="wheel"
-				/>
-			</label>
+		<div class="button-field">
+			<button
+				id="validate-dates"
+				style="position: absolute; left: -9999px; top: -9999px"
+			>
+				Valider mes dates
+			</button>
+			<a href="./Résultats_public/resultats-public.html" id="viewResultsBtn"
+				>Résultats</a
+			>
+			<button id="resetNamesBtn">Oublier</button>
+			<!-- Bouton validation visible -->
+			<div class="validation-wrapper">
+				<input type="checkbox" id="trigger" hidden />
+				<label for="trigger" class="validate-button">
+					<span class="text">Valider</span>
+					<img
+						src="./image/Akab_original_logo-(backround removed).png"
+						alt="Roue"
+						class="wheel"
+					/>
+				</label>
+			</div>
 		</div>
-
 		<!-- Bouton validation caché mais accessible au script -->
-		<button
-			id="validate-dates"
-			style="position: absolute; left: -9999px; top: -9999px"
-		>
-			Valider mes dates
-		</button>
-		<button id="resetNamesBtn">Oublier</button>
 
 		<div id="output"></div>
 

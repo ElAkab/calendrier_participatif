@@ -1,3 +1,39 @@
+// Fonction pour récupérer et afficher les votes
+async function refreshVotes() {
+	try {
+		const res = await fetch(`${BASE_URL}/votes`);
+		if (!res.ok)
+			throw new Error("Erreur serveur lors de la récupération des votes");
+
+		const votes = await res.json();
+
+		// Exemple simple : afficher dans un div avec id="votesList"
+		const votesList = document.getElementById("votesList");
+		if (!votesList) return;
+
+		votesList.innerHTML = ""; // reset contenu
+
+		votes.forEach(({ userName, selectedDates }) => {
+			const userDiv = document.createElement("div");
+			userDiv.textContent = `${userName} : ${selectedDates.join(", ")}`;
+			votesList.appendChild(userDiv);
+		});
+	} catch (error) {
+		console.error("Erreur refresh votes :", error);
+	}
+}
+
+// Appel initial + rappel toutes les 5 secondes
+refreshVotes();
+
+// À placer dans un <script> ou fichier JS chargé au démarrage
+function setVH() {
+	let vh = window.innerHeight * 0.01;
+	document.documentElement.style.setProperty("--vh", `${vh}px`);
+}
+window.addEventListener("resize", setVH);
+setVH();
+
 const resultList = document.getElementById("result-list");
 const BASE_URL =
 	window.location.hostname === "localhost"
@@ -30,6 +66,10 @@ fetch(`${BASE_URL}/votes`)
 			Object.values(dateCount).length > 0
 				? Math.max(...Object.values(dateCount))
 				: 0;
+
+		// Crée un conteneur pour tous les participants
+		const container = document.createElement("div");
+		container.classList.add("participants-container");
 
 		// Affichage des participants
 		participants.forEach(({ userName, selectedDates }) => {
@@ -66,8 +106,12 @@ fetch(`${BASE_URL}/votes`)
 			});
 
 			participantDiv.appendChild(ul);
-			resultList.appendChild(participantDiv);
+			container.appendChild(participantDiv);
 		});
+
+		// Nettoie l'affichage précédent et ajoute le nouveau container
+		resultList.innerHTML = "";
+		resultList.appendChild(container);
 	})
 	.catch((error) => {
 		console.error("Erreur lors du chargement :", error);
@@ -127,14 +171,14 @@ fetch(`${BASE_URL}/votes`)
 
 			if (votesMissing > 0) {
 				const message = document.createElement("p");
-				message.textContent = `Il manque encore ${votesMissing} participant${
-					votesMissing > 1 ? "s" : ""
-				} à voter.`;
+				message.textContent = `Il manque encore ${votesMissing} ${
+					votesMissing > 1 ? "personnes" : "personne"
+				}.`;
 				message.style.fontStyle = "italic";
 				message.style.color = "#007bff";
 				container.appendChild(message);
 			} else {
-				container.textContent = "Tous les participants ont voté, merci ! 🎉";
+				container.textContent = "Tout le monde a voté ! 🎉";
 			}
 		}
-	}); // ← il manquait celle-ci
+	});

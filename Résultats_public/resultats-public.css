@@ -6,7 +6,8 @@
 }
 
 body {
-	height: 100vh;
+	height: calc(var(--vh, 1vh) * 100);
+	overflow-y: auto; /* scroll vertical si besoin */
 	background: linear-gradient(135deg, #ffd3a5, #fd6585);
 	display: flex;
 	justify-content: center;
@@ -32,13 +33,52 @@ h1 {
 	max-width: 100%; /* Pour que ça respecte la largeur parent */
 }
 
+.participants-container {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 20px;
+	justify-items: center;
+	width: 100%;
+	max-width: 1400px;
+	margin: 0 auto;
+	padding: 0 1rem;
+	box-sizing: border-box;
+}
+
 .participant {
 	background: rgba(255, 255, 255, 0.85);
 	padding: 15px 20px;
 	border-radius: 10px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-	margin-bottom: 25px;
-	width: 320px;
+	max-width: 400px;
+	min-width: 280px; /* évite que ça devienne trop étroit */
+	width: 100%;
+	box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+	.participants-container {
+		grid-template-columns: 1fr;
+		padding: 0 0.5rem;
+	}
+}
+
+@media (max-width: 1200px) {
+	.participants-container {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+@media (max-width: 900px) {
+	.participants-container {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (max-width: 600px) {
+	.participants-container {
+		grid-template-columns: 1fr;
+	}
 }
 
 .participant h2 {

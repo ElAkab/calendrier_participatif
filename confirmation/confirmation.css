@@ -69,7 +69,7 @@ p {
 	color: white;
 	line-height: 1.6;
 	max-width: 90vw;
-	margin-bottom: 2rem;
+	margin-bottom: 1rem;
 	padding: 0 1rem;
 }
 
@@ -84,15 +84,47 @@ a:hover {
 	text-decoration: underline;
 }
 
+#viewResultsBtn {
+	display: inline-block;
+	margin: 0 0 20px 0;
+	padding: 10px 20px;
+	background-color: #4caf50;
+	color: white;
+	text-decoration: none;
+	border-radius: 15px;
+	transition: background-color 0.3s;
+	white-space: nowrap; /* Empêche le retour à la ligne */
+}
+
+@media screen and (max-width: 600px) {
+	#viewResultsBtn {
+		font-size: 1.1rem;
+		padding: 14px 24px;
+	}
+}
+
+#viewResultsBtn:hover {
+	background-color: #45a049;
+}
+
 /* CONTAINER DE LISTE EN UNE LIGNE */
 ul#datesList {
 	display: flex;
+	max-width: 952px;
 	gap: 1rem;
 	overflow-x: auto;
 	padding: 1rem;
 	border-radius: 12px;
 	max-width: 90vw;
 	scroll-behavior: smooth;
+}
+
+@media screen and (max-width: 600px) {
+	ul#datesList {
+		gap: 1.5rem;
+		padding: 1.2rem;
+		font-size: 1.1rem;
+	}
 }
 
 /* STYLE DES ÉLÉMENTS DATES */
@@ -103,7 +135,47 @@ ul#datesList li {
 	color: #fff;
 	font-weight: 700;
 	padding: 0.7rem 1.2rem;
-	border-radius: 8px;
 	box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.2);
 	min-width: max-content;
+}
+
+/* 🔥 Version 100% responsive pour mobile */
+@media screen and (max-width: 600px) {
+	/* Le bouton vert */
+	#viewResultsBtn {
+		display: block;
+		width: 100%;
+		max-width: 100%;
+		font-size: 1.3rem;
+		padding: 16px;
+		box-sizing: border-box;
+		text-align: center;
+		white-space: nowrap;
+	}
+
+	/* Le conteneur UL qui scrolle horizontalement */
+	ul#datesList {
+		width: 100%;
+		max-width: 100%;
+		gap: 1rem;
+		padding: 1rem;
+		font-size: 1.2rem;
+	}
+
+	/* Les éléments de dates */
+	ul#datesList li {
+		font-size: 1.2rem;
+		padding: 1rem 1.5rem;
+		min-width: fit-content;
+		border-radius: 10px;
+		flex: 0 0 auto;
+	}
+
+	/* Le bouton "Valider" (image + texte) */
+	.validation-wrapper .validate-button {
+		width: 100%;
+		max-width: 100%;
+		padding: 1rem;
+		font-size: 1.3rem;
+	}
 }
