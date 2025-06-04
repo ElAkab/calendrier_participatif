@@ -92,30 +92,49 @@ const users = [
 	{ names: ["Bilal"], placeholder: "C'est Bilal ?" },
 ];
 
-const allNamesRaw = localStorage.getItem("allUserNames") || "[]";
-const allNames = JSON.parse(allNamesRaw).map((n) => n.trim().toLowerCase());
+fetch(`${BASE_URL}/votes`)
+	.then((res) => {
+		if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+		return res.json();
+	})
+	.then((participants) => {
+		// --- Compter les votes réels depuis les données reçues ---
+		const votedNames = participants.map((p) => p.userName.trim().toLowerCase());
 
-const totalVotesExpected = users.reduce(
-	(acc, user) => acc + (user.maxVotes || 1),
-	0
-);
+		// Liste des noms attendus (incluant variantes)
+		const expectedVoters = users.flatMap((user) =>
+			user.names.map((n) => n.trim().toLowerCase())
+		);
 
-const totalVotesCast = allNames.length;
-const votesMissing = totalVotesExpected - totalVotesCast;
+		// Supprimer les doublons
+		const uniqueVotedNames = [...new Set(votedNames)];
 
-const container = document.getElementById("message-container");
-if (container) {
-	container.innerHTML = ""; // Vide au cas où
+		// Calcul du nombre total de votes attendus (maxVotes personnalisés pris en compte)
+		const totalVotesExpected = users.reduce(
+			(acc, user) => acc + (user.maxVotes || 1),
+			0
+		);
 
-	if (votesMissing > 0) {
-		const message = document.createElement("p");
-		message.textContent = `Il manque encore ${votesMissing} participant${
-			votesMissing > 1 ? "s" : ""
-		} à voter.`;
-		message.style.fontStyle = "italic";
-		message.style.color = "#007bff";
-		container.appendChild(message);
-	} else {
-		container.textContent = "Tous les participants ont voté, merci ! 🎉";
-	}
-}
+		// Nombre de votes réellement enregistrés
+		const totalVotesCast = uniqueVotedNames.length;
+
+		const votesMissing = totalVotesExpected - totalVotesCast;
+
+		// --- Affichage du message ---
+		const container = document.getElementById("message-container");
+		if (container) {
+			container.innerHTML = "";
+
+			if (votesMissing > 0) {
+				const message = document.createElement("p");
+				message.textContent = `Il manque encore ${votesMissing} participant${
+					votesMissing > 1 ? "s" : ""
+				} à voter.`;
+				message.style.fontStyle = "italic";
+				message.style.color = "#007bff";
+				container.appendChild(message);
+			} else {
+				container.textContent = "Tous les participants ont voté, merci ! 🎉";
+			}
+		}
+	}); // ← il manquait celle-ci
