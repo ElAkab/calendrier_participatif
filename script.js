@@ -164,17 +164,25 @@ document.addEventListener("DOMContentLoaded", () => {
 				});
 		}
 
-		// Le reste de ton code...
+		// Nettoyage local
 		localStorage.removeItem("allUserNames");
 		localStorage.removeItem("userName");
 		localStorage.removeItem("selectedDates");
 
 		alert("Toutes les données ont été réinitialisées.");
 
-		modal.classList.add("active");
-		input.value = "";
-		input.classList.remove("invalid");
-		nameMessage.textContent = "";
+		// Réinitialisation de l'affichage local (si modal etc. existent)
+		const modal = document.querySelector(".modal"); // ou l'id réel
+		if (modal) modal.classList.add("active");
+
+		const input = document.querySelector("#name-input"); // adapte l'ID
+		if (input) {
+			input.value = "";
+			input.classList.remove("invalid");
+		}
+
+		const nameMessage = document.querySelector("#name-message"); // adapte l'ID
+		if (nameMessage) nameMessage.textContent = "";
 
 		const allSelected = document.querySelectorAll(".selected");
 		allSelected.forEach((el) => el.classList.remove("selected"));
@@ -182,7 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		const output = document.querySelector("#output");
 		if (output) output.textContent = "";
 
-		location.reload(); // forcer l'actualisation
+		location.reload(); // recharge pour voir les résultats mis à jour
 	});
 
 	checkName();
