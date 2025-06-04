@@ -55,7 +55,7 @@ fetch(`${BASE_URL}/votes`)
 
 				li.textContent = formattedDate;
 
-				if (dateCount[date] === maxVotes && maxVotes > 1) {
+				if (dateCount[date] === participants.length) {
 					li.classList.add("popular");
 					const span = document.createElement("span");
 					span.textContent = " Unanimité !";
