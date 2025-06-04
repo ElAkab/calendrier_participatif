@@ -137,17 +137,22 @@ app.get("/votes", async (req, res) => {
 });
 
 // --- Réinitialisation totale ---
-app.delete("/clear", (req, res) => {
-	participants.length = 0;
-	for (const key in votesByDate) delete votesByDate[key];
+app.delete("/clear", async (req, res) => {
+	try {
+		participants.length = 0;
+		for (const key in votesByDate) delete votesByDate[key];
 
-	fs.writeFile("data.json", "[]", (err) => {
-		if (err) {
-			console.error("Erreur suppression :", err);
-			return res.status(500).send("Erreur serveur");
-		}
+		// Vider le fichier local (data.json)
+		await fs.promises.writeFile("data.json", "[]");
+
+		// Vider la table PostgreSQL
+		await pool.query("DELETE FROM votes");
+
 		res.send("Données supprimées");
-	});
+	} catch (err) {
+		console.error("Erreur suppression :", err);
+		res.status(500).send("Erreur serveur");
+	}
 });
 
 // --- Suppression d'un participant ---
@@ -187,16 +192,7 @@ app.get("/", (req, res) => {
 
 // --- Cette route envoie les données pour la page publique ---
 app.get("/get-results", (req, res) => {
-	const results = [
-		{
-			name: "Ali",
-			selectedDates: ["2025-06-10", "2025-06-12"],
-		},
-		{
-			name: "Hadja",
-			selectedDates: ["2025-06-10"],
-		},
-	];
+	const results = [];
 	res.json(results);
 });
 
