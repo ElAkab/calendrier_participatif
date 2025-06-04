@@ -32,12 +32,12 @@ fetch(`${BASE_URL}/votes`)
 				: 0;
 
 		// Affichage des participants
-		participants.forEach(({ name, selectedDates }) => {
+		participants.forEach(({ userName, selectedDates }) => {
 			const participantDiv = document.createElement("div");
 			participantDiv.classList.add("participant");
 
 			const h2 = document.createElement("h2");
-			h2.textContent = name;
+			h2.textContent = userName;
 			participantDiv.appendChild(h2);
 
 			const p = document.createElement("p");
@@ -50,8 +50,9 @@ fetch(`${BASE_URL}/votes`)
 			selectedDates.sort().forEach((date) => {
 				const li = document.createElement("li");
 
-				const [year, month, day] = date.split("-");
+				const [year, month, day] = date.slice(0, 10).split("-");
 				const formattedDate = `${day}/${month}/${year}`;
+
 				li.textContent = formattedDate;
 
 				if (dateCount[date] === maxVotes && maxVotes > 1) {
