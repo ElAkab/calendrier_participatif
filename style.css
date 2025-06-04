@@ -7,6 +7,7 @@
 
 body {
 	height: 100vh;
+	overflow-y: auto; /* scroll vertical si besoin */
 	background: linear-gradient(135deg, #ffd3a5, #fd6585);
 	display: flex;
 	justify-content: center;
@@ -398,9 +399,9 @@ input.invalid {
 
 	/* Ajouts pour rester à l'écran */
 	position: fixed; /* position fixe par rapport à la fenêtre */
-	bottom: 20px; /* place en bas avec un peu de marge */
-	left: 50%; /* centré horizontalement */
-	transform: translateX(-50%);
+	bottom: 20px !important; /* place en bas avec un peu de marge */
+	left: 50% !important; /* centré horizontalement */
+	transform: translateX(-50%) !important;
 	z-index: 9999; /* au-dessus de tout */
 }
 

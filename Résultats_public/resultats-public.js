@@ -26,13 +26,15 @@ async function refreshVotes() {
 // Appel initial + rappel toutes les 5 secondes
 refreshVotes();
 
-// À placer dans un <script> ou fichier JS chargé au démarrage
-function setVH() {
+// À placer dans un fichier JS chargé au démarrage
+// Fix mobile 100vh bug
+function setVh() {
 	let vh = window.innerHeight * 0.01;
 	document.documentElement.style.setProperty("--vh", `${vh}px`);
 }
-window.addEventListener("resize", setVH);
-setVH();
+
+setVh();
+window.addEventListener("resize", setVh);
 
 const resultList = document.getElementById("result-list");
 const BASE_URL =
