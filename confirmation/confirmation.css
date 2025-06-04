@@ -109,18 +109,21 @@ a:hover {
 	display: inline-block;
 	margin: 0 0 20px 0;
 	padding: 10px 20px;
-	background-color: #4caf50;
+	background-color: #2f7731;
 	color: white;
 	text-decoration: none;
 	border-radius: 15px;
 	transition: background-color 0.3s;
-	white-space: nowrap; /* Empêche le retour à la ligne */
+	white-space: nowrap;
+	max-width: 90vw; /* Empêche le bouton de déborder trop sur petits écrans */
+	font-size: 1rem; /* Déplace ici pour éviter une taille excessive */
+	transition: 0.2s ease-in-out;
 }
 
 @media screen and (max-width: 600px) {
 	#viewResultsBtn {
 		font-size: 1.1rem;
-		padding: 14px 24px;
+		padding: 12px 20px;
 	}
 }
 
@@ -129,7 +132,7 @@ a:hover {
 }
 
 #viewResultsBtn:active {
-	background-color: #45a049;
+	transform: scale(0.98);
 }
 
 /* CONTAINER DE LISTE EN UNE LIGNE */
@@ -155,21 +158,20 @@ ul#datesList {
 /* STYLE DES ÉLÉMENTS DATES */
 ul#datesList li {
 	list-style: none;
-	background-color: #4c9dd9;
+	background-color: #110055;
 	color: white;
 	font-weight: bold;
 	padding: 0.7rem 1.2rem;
-	border-radius: 8px;
+	border-radius: 0px !important;
 	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 	width: 100%;
 	max-width: 400px;
 	text-align: center;
 }
 
-/* 🔥 Version 100% responsive pour mobile */
 @media screen and (max-width: 600px) {
 	/* Le bouton vert */
-	#viewResultsBtn {
+	/* #viewResultsBtn {
 		display: block;
 		width: 100%;
 		max-width: 100%;
@@ -178,9 +180,9 @@ ul#datesList li {
 		box-sizing: border-box;
 		text-align: center;
 		white-space: nowrap;
-	}
+	} */
 
-	/* Le conteneur UL qui scrolle horizontalement */
+	/* Conteneur UL qui scrolle horizontalement */
 	ul#datesList {
 		width: 100%;
 		max-width: 100%;
@@ -189,7 +191,7 @@ ul#datesList li {
 		font-size: 1.2rem;
 	}
 
-	/* Les éléments de dates */
+	/* éléments de dates */
 	ul#datesList li {
 		font-size: 1.2rem;
 		padding: 1rem 1.5rem;
@@ -198,7 +200,7 @@ ul#datesList li {
 		flex: 0 0 auto;
 	}
 
-	/* Le bouton "Valider" (image + texte) */
+	/* Bouton "Valider" (image + texte) */
 	.validation-wrapper .validate-button {
 		width: 100%;
 		max-width: 100%;
