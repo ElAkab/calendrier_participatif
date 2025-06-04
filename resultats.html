@@ -41,7 +41,7 @@
 			function loadResults() {
 				list.innerHTML = "";
 
-				fetch(`${BASE_URL}/all`)
+				fetch(`${BASE_URL}/votes`)
 					.then((res) => res.json())
 					.then((data) => {
 						if (data.length === 0) {

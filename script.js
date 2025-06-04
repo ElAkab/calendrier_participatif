@@ -45,34 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const allNamesRaw = localStorage.getItem("allUserNames") || "[]";
 	const allNames = JSON.parse(allNamesRaw).map((n) => n.trim().toLowerCase());
 
-	// Calcul du total des votes attendus
-	const totalVotesExpected = users.reduce(
-		(acc, user) => acc + (user.maxVotes || 1),
-		0
-	);
-
-	// Calcul du total des votes effectués
-	const totalVotesCast = allNames.length;
-
-	// Calcul du nombre de votes manquants
-	const votesMissing = totalVotesExpected - totalVotesCast;
-
-	// Affichage dans la div message-container
-	const container = document.getElementById("message-container");
-	if (container) {
-		if (votesMissing > 0) {
-			const message = document.createElement("p");
-			message.textContent = `Il manque encore ${votesMissing} participant${
-				votesMissing > 1 ? "s" : ""
-			}.`;
-			message.style.fontStyle = "italic";
-			message.style.color = "#007bff"; // couleur personnalisée, tu peux adapter
-			container.appendChild(message);
-		} else {
-			container.textContent = "Tous les participants ont voté ! 🎉";
-		}
-	}
-
+	// Filtrer les utilisateurs disponibles
 	const availableUsers = users.filter((user) => {
 		const maxVotes = user.maxVotes || 1;
 		const count = allNames.filter((name) =>
@@ -520,7 +493,7 @@ validateBtn?.addEventListener("click", () => {
 
 			localStorage.setItem("selectedDates", JSON.stringify(selectedDates));
 
-			return fetch(`${BASE_URL}/all`);
+			return fetch(`${BASE_URL}/votes`);
 		})
 		.then((res) => {
 			if (!res.ok) throw new Error("Erreur lors du chargement des données");
