@@ -4,7 +4,7 @@ const BASE_URL =
 		? "http://localhost:3000"
 		: "https://calendrier-participatif.onrender.com";
 
-fetch(`${BASE_URL}/get-results`)
+fetch(`${BASE_URL}/votes`)
 	.then((res) => {
 		if (!res.ok) {
 			throw new Error(`HTTP error! status: ${res.status}`);
