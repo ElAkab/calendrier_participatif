@@ -17,7 +17,7 @@
 			id="deleteNameInput"
 			placeholder="Prénom exact à supprimer"
 		/>
-		<button id="deleteUserBtn">Supprimer</button>
+		<button onclick="resetVotes()" id="deleteUserBtn">Supprimer</button>
 
 		<h1>Liste des participants</h1>
 		<ul id="results"></ul>
@@ -126,6 +126,26 @@
 							});
 					}
 				});
+			}
+
+			function resetVotes() {
+				if (confirm("⚠️ Es-tu sûr de vouloir supprimer tous les votes ?")) {
+					fetch("https://calendrier-participatif.onrender.com/clear", {
+						method: "DELETE",
+					})
+						.then((res) => {
+							if (!res.ok) throw new Error("Erreur lors de la suppression.");
+							return res.text();
+						})
+						.then((msg) => {
+							alert("✅ Données supprimées !");
+							// Recharge la page pour afficher les résultats vides
+							location.reload();
+						})
+						.catch((err) => {
+							alert("❌ Une erreur est survenue : " + err.message);
+						});
+				}
 			}
 
 			// 🔁 Suppression d'un participant

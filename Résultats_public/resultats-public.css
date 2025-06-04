@@ -147,7 +147,7 @@ li span {
 
 .back-button {
 	display: inline-block;
-	margin: 2rem auto;
+	margin: 1rem auto;
 	padding: 0.8rem 1.5rem;
 	background-color: #4c9dd9;
 	color: white;
@@ -168,4 +168,8 @@ li span {
 
 .back-button:active {
 	background-color: #3b88c3;
+}
+
+#result-list {
+	margin-bottom: 8px;
 }

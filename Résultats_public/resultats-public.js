@@ -51,8 +51,10 @@ fetch(`${BASE_URL}/votes`)
 	})
 	.then((participants) => {
 		if (!Array.isArray(participants) || participants.length === 0) {
+			resultList.style.listStyle = "none";
+			resultList.style.textAlign = "center";
 			resultList.innerHTML =
-				"<li>Aucun participant ou dates sélectionnées.</li>";
+				"<li>Y a rien ici... comme dans mon estomac d'ailleurs...<br>À toi de remplir !<br><small><em>(Pas mon estomac, mais après si tu veux m'offrir à manger, sache que j'aime ...)</em></small></li>";
 			return;
 		}
 
