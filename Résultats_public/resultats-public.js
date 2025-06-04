@@ -36,6 +36,16 @@ function setVh() {
 setVh();
 window.addEventListener("resize", setVh);
 
+function showMessage(text, duration = 3000) {
+	const messageContainer = document.getElementById("message-container");
+	messageContainer.textContent = text;
+	messageContainer.classList.add("show");
+
+	setTimeout(() => {
+		messageContainer.classList.remove("show");
+	}, duration);
+}
+
 const resultList = document.getElementById("result-list");
 const BASE_URL =
 	window.location.hostname === "localhost"
@@ -45,7 +55,7 @@ const BASE_URL =
 fetch(`${BASE_URL}/votes`)
 	.then((res) => {
 		if (!res.ok) {
-			throw new Error(`HTTP error! status: ${res.status}`);
+			throw new Error(`Erreur HTTP : ${res.status}`);
 		}
 		return res.json();
 	})
@@ -55,6 +65,9 @@ fetch(`${BASE_URL}/votes`)
 			resultList.style.textAlign = "center";
 			resultList.innerHTML =
 				"<li>Y a rien ici... comme dans mon estomac d'ailleurs...<br>À toi de remplir !<br><small><em>(Pas mon estomac, mais après si tu veux m'offrir à manger, sache que j'aime ...)</em></small></li>";
+
+			// Montre un message en bas de l'écran
+			showMessage("Aucun participant trouvé pour le moment.");
 			return;
 		} else {
 			document.querySelector("span").style.display = "none";
@@ -73,11 +86,9 @@ fetch(`${BASE_URL}/votes`)
 				? Math.max(...Object.values(dateCount))
 				: 0;
 
-		// Crée un conteneur pour tous les participants
 		const container = document.createElement("div");
 		container.classList.add("participants-container");
 
-		// Affichage des participants
 		participants.forEach(({ userName, selectedDates }) => {
 			const participantDiv = document.createElement("div");
 			participantDiv.classList.add("participant");
@@ -92,16 +103,17 @@ fetch(`${BASE_URL}/votes`)
 
 			const ul = document.createElement("ul");
 
-			// Tri des dates avant affichage
 			selectedDates.sort().forEach((date) => {
 				const li = document.createElement("li");
-
 				const [year, month, day] = date.slice(0, 10).split("-");
 				const formattedDate = `${day}/${month}/${year}`;
 
 				li.textContent = formattedDate;
 
-				if (dateCount[date] === participants.length) {
+				if (
+					participants.length > 1 &&
+					dateCount[date] === participants.length
+				) {
 					li.classList.add("popular");
 					const span = document.createElement("span");
 					span.textContent = " Unanimité !";
@@ -115,13 +127,15 @@ fetch(`${BASE_URL}/votes`)
 			container.appendChild(participantDiv);
 		});
 
-		// Nettoie l'affichage précédent et ajoute le nouveau container
 		resultList.innerHTML = "";
 		resultList.appendChild(container);
+
+		// Facultatif : afficher un message bref de succès
+		showMessage("Résultats chargés avec succès !", 2000);
 	})
 	.catch((error) => {
-		console.error("Erreur lors du chargement :", error);
-		resultList.innerHTML = "<li>Erreur lors du chargement des résultats.</li>";
+		console.error("Erreur lors du chargement des votes :", error);
+		showMessage("Erreur de chargement des résultats. Réessaie plus tard.");
 	});
 
 const users = [
