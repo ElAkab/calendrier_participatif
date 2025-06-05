@@ -10,7 +10,7 @@ const { Pool } = require("pg");
 const pool = new Pool({
 	connectionString:
 		process.env.DATABASE_URL ||
-		"postgresql://neondb_owner:npg_ciwr68XnaelI@ep-dry-bush-a2jyvwmq-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require",
+		"postgresql://neondb_owner:npg_T1yFpsJ5xmZG@ep-dry-bush-a2jyvwmq-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require",
 });
 
 const app = express();
