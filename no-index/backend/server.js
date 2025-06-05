@@ -28,12 +28,14 @@ console.log(
 	path.join(__dirname, "..", "Résultats_public")
 );
 
-app.use(express.static(path.join(__dirname, "..")));
-app.use(express.static(path.join(__dirname, "..", "Résultats_public")));
+app.use(express.static(path.join(__dirname, "..", "frontend")));
+app.use(
+	express.static(path.join(__dirname, "..", "frontend", "Résultats_public"))
+);
 
 // Route pour index.html à la racine
 app.get("/", (req, res) => {
-	res.sendFile(path.join(__dirname, "..", "index.html"));
+	res.sendFile(path.join(__dirname, "..", "frontend", "index.html"));
 });
 
 // --- Enregistrement des votes ---
@@ -199,12 +201,18 @@ app.get("/get-results", (req, res) => {
 // --- Cette route sert la page HTML publique ---
 app.get("/resultats-public.html", (req, res) => {
 	res.sendFile(
-		path.join(__dirname, "..", "Résultats_public", "resultats-public.html")
+		path.join(
+			__dirname,
+			"..",
+			"frontend",
+			"Résultats_public",
+			"resultats-public.html"
+		)
 	);
 });
 
 app.get("/resultats.html", (req, res) => {
-	res.sendFile(path.join(__dirname, "..", "resultats.html"));
+	res.sendFile(path.join(__dirname, "..", "frontend", "resultats.html"));
 });
 
 // --- Lancement du serveur ---
