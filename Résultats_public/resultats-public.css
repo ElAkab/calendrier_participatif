@@ -47,6 +47,7 @@ h1 {
 	margin: 0 auto;
 	padding: 0 1rem;
 	box-sizing: border-box;
+	align-items: flex-start; /* <-- important pour garder hauteurs indépendantes */
 }
 
 .participant {
