@@ -63,15 +63,22 @@ body {
 
 #resetNamesBtn {
 	background-color: #931b0d;
-	transition: 0.2s;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	cursor: pointer;
+	transition: transform 0.25s ease, box-shadow 0.25s ease;
+	box-shadow: 0 2px 6px rgba(147, 27, 13, 0.5);
 }
 
 #resetNamesBtn:hover {
-	transform: scale(95%);
+	transform: translateY(-3px);
+	box-shadow: 0 6px 12px rgba(147, 27, 13, 0.4);
 }
 
 #resetNamesBtn:active {
-	transform: scale(95%);
+	transform: translateY(-3px);
+	box-shadow: 0 6px 12px rgba(147, 27, 13, 0.4);
 }
 
 #welcomeModal .modal-content p {
@@ -106,14 +113,12 @@ h1 {
 	text-shadow: 2px 2px 5px rgba(253, 101, 133, 0.7),
 		0 0 10px rgba(255, 211, 165, 0.8);
 	margin-bottom: 20px;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-
-	/* Ajouts pour centrer et empêcher le retour à la ligne */
-	text-align: center; /* Centre horizontalement */
-	white-space: nowrap; /* Empêche le retour à la ligne */
-	overflow: hidden; /* Coupe si trop long */
-	max-width: 100%; /* Pour que ça respecte la largeur parent */
+	-webkit-font-smoothing: antialiased; /* pour un meilleur rendu des polices */
+	-moz-osx-font-smoothing: grayscale; /* pour un meilleur rendu des polices */
+	text-align: center;
+	white-space: nowrap; /* empêche le retour à la ligne */
+	overflow: hidden;
+	max-width: 100%;
 }
 
 .calendar {
@@ -246,6 +251,7 @@ h1 {
 }
 
 .button-field {
+	padding-top: 3px;
 	width: 90vw;
 	max-width: 952px;
 	display: flex;
@@ -269,13 +275,14 @@ h1 {
 	justify-content: center;
 	background-color: #000;
 	color: #fff;
-	padding: 12px 20px;
+	padding: 10px 5vw;
 	border-radius: 0 15px 15px 0;
 	font-size: 1rem;
 	cursor: pointer;
 	overflow: hidden;
 	white-space: nowrap;
 	width: 120px;
+	border: 2px solid #000;
 	transition: width 0.6s ease, padding 0.6s ease;
 }
 
@@ -321,25 +328,33 @@ h1 {
 	}
 }
 
-/* Pour #viewResultsBtn */
 #viewResultsBtn {
 	display: inline-block;
 	padding: 10px 5vw;
-	background-color: #4caf50;
+	background: linear-gradient(to right, #7bbd73, #4caf50, #7bbd73);
+	background-size: 200% 100%;
+	background-position: left center;
 	color: white;
 	text-decoration: none;
 	border-radius: 15px 0 0 15px;
-	transition: background-color 0.3s;
+	transition: background-position 0.3s ease;
 	white-space: nowrap;
 	font-size: 1rem;
 	min-width: 100px;
 	max-width: 100%;
 	box-sizing: border-box;
 	text-align: center;
+	border: 2px solid #4caf50;
 }
 
 #viewResultsBtn:hover {
-	background-color: #45a049;
+	background-position: right center;
+	border-color: #7bbd73;
+}
+
+#viewResultsBtn:active {
+	background-position: right center;
+	border-color: #7bbd73;
 }
 
 .inactive,

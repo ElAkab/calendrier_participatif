@@ -146,6 +146,5 @@ document.addEventListener("DOMContentLoaded", () => {
 	// Chargement immédiat
 	loadVotesAndRender();
 
-	// Rafraîchissement régulier
 	setInterval(loadVotesAndRender, 5000);
 });

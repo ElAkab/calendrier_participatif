@@ -53,24 +53,27 @@ document.addEventListener("DOMContentLoaded", () => {
 		).length;
 		return count < maxVotes;
 	});
-
+	// Si aucun utilisateur n'est disponible, on affiche un message
 	const randomIndex = Math.floor(Math.random() * availableUsers.length);
 	input.placeholder =
 		availableUsers.length > 0
 			? availableUsers[randomIndex].placeholder
 			: "Plus de prénoms disponibles";
 
+	// Fonction pour récupérer tous les noms stockés
 	function getAllNames() {
 		const raw = localStorage.getItem("allUserNames");
 		return raw ? JSON.parse(raw) : [];
 	}
 
+	// Fonction pour sauvegarder un nom
 	function saveName(name) {
 		const allNames = getAllNames();
 		allNames.push(name);
 		localStorage.setItem("allUserNames", JSON.stringify(allNames));
 	}
 
+	// Vérification si le nom est autorisé
 	function isAllowedName(inputName) {
 		const lower = inputName.trim().toLowerCase();
 		return users.some((user) =>
@@ -78,6 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		);
 	}
 
+	// Vérification si le nom est déjà pris
 	function isNameTaken(inputName) {
 		const lower = inputName.trim().toLowerCase();
 		const allNames = getAllNames().map((n) => n.trim().toLowerCase());
@@ -95,6 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		return count >= maxVotes;
 	}
 
+	// Vérification du nom stocké
 	function checkName() {
 		const storedName = localStorage.getItem("userName");
 		if (!storedName) {
@@ -108,6 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	}
 
+	// Gestion des événements du modal
 	btn.addEventListener("click", () => {
 		input.classList.remove("invalid");
 		nameMessage.style.color = "#e74c3c";
@@ -141,6 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		console.log(`On dirait bien que c'est, ${name} 😱 !`);
 	});
 
+	// Gestion de l'événement de validation du modal
 	input.addEventListener("keydown", (event) => {
 		if (event.key === "Enter") {
 			event.preventDefault();
@@ -148,7 +155,16 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
+	// Gestion du bouton de réinitialisation
 	resetBtn.addEventListener("click", () => {
+		if (
+			!confirm(
+				"Cette action supprimera toutes les données (prénom et dates), idéal pour recommencer 🤔.. \n\nT'es sûr ?"
+			)
+		) {
+			return; // On annule l'action si l'utilisateur clique sur "Annuler"
+		}
+
 		const userName = localStorage.getItem("userName");
 
 		if (userName) {
@@ -172,16 +188,16 @@ document.addEventListener("DOMContentLoaded", () => {
 		alert("Toutes les données ont été réinitialisées.");
 
 		// Réinitialisation de l'affichage local (si modal etc. existent)
-		const modal = document.querySelector(".modal"); // ou l'id réel
+		const modal = document.querySelector(".modal");
 		if (modal) modal.classList.add("active");
 
-		const input = document.querySelector("#name-input"); // adapte l'ID
+		const input = document.querySelector("#name-input");
 		if (input) {
 			input.value = "";
 			input.classList.remove("invalid");
 		}
 
-		const nameMessage = document.querySelector("#name-message"); // adapte l'ID
+		const nameMessage = document.querySelector("#name-message");
 		if (nameMessage) nameMessage.textContent = "";
 
 		const allSelected = document.querySelectorAll(".selected");
@@ -190,10 +206,10 @@ document.addEventListener("DOMContentLoaded", () => {
 		const output = document.querySelector("#output");
 		if (output) output.textContent = "";
 
-		location.reload(); // recharge pour voir les résultats mis à jour
+		location.reload();
 	});
 
-	checkName();
+	checkName(); // Vérification du nom à l'ouverture de la page
 });
 
 const nameInput = document.getElementById("name");
