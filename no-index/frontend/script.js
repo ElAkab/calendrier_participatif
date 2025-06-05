@@ -3,7 +3,7 @@ console.log("JS chargé");
 const BASE_URL =
 	window.location.hostname === "localhost"
 		? "http://localhost:3000"
-		: "https://calendrier-participatif.onrender.com";
+		: "https://calendrier-participatif-backend.onrender.com";
 
 function safeParseJSON(raw) {
 	try {
