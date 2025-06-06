@@ -373,6 +373,8 @@ h1 {
 	background-color: #007bff;
 	color: white;
 	border-radius: 50%;
+	box-shadow: 0 0 8px rgba(0, 123, 255, 0.6); /* lueur bleu vif */
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 button.disabled {
@@ -425,4 +427,38 @@ input.invalid {
 	color: white;
 	font-weight: bold;
 	border-radius: 5px;
+}
+
+h2 {
+	color: #0e7490;
+	font-size: 1rem;
+	margin-top: 0.5rem;
+	text-align: center;
+}
+
+.vacation {
+	background: linear-gradient(135deg, #e6fff2, #c0fede); /* Vert très clair */
+	border-radius: 0 !important;
+	box-shadow: 0 1px 3px rgba(80, 200, 120, 0.2); /* Ombre verte légère */
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	position: relative;
+}
+
+/* Petit effet de soulèvement au survol */
+.vacation:hover {
+	transform: scale(1.05);
+	box-shadow: 0 4px 8px rgba(80, 200, 120, 0.3); /* Ombre verte plus marquée */
+}
+
+.selected.vacation {
+	background: linear-gradient(135deg, #a8f0c5, #4a90e2);
+	color: white;
+	border-radius: 50%;
+	box-shadow: 0 0 8px rgba(74, 144, 226, 0.6); /* lueur bleu-vert */
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.selected.vacation:hover {
+	transform: scale(1.1);
+	box-shadow: 0 0 12px rgba(74, 144, 226, 0.8);
 }
