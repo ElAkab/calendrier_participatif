@@ -39,6 +39,40 @@ document.addEventListener("DOMContentLoaded", () => {
 		{ names: ["Bilal"], placeholder: "C'est Bilal ?" },
 	];
 
+	const VACANCES = {
+		"Vacances d'hiver (Noël)": [
+			["2024-12-24", "2025-01-05"],
+			["2025-12-22", "2026-01-02"],
+			["2026-12-27", "2027-01-03"],
+			["2027-12-26", "2028-01-02"],
+		],
+		"Vacances de Carnaval": [
+			["2025-02-24", "2025-03-09"],
+			["2026-02-16", "2026-02-28"],
+			["2027-02-15", "2027-02-21"],
+			["2028-02-28", "2028-03-05"],
+		],
+		"Vacances de printemps (Pâques)": [
+			["2025-04-28", "2025-05-11"],
+			["2026-04-27", "2026-05-10"],
+			["2027-04-05", "2027-04-18"],
+			["2028-03-27", "2028-04-09"],
+		],
+		"Vacances d'été": [
+			["2025-07-05", "2025-08-24"],
+			["2026-07-04", "2026-08-24"],
+			["2027-07-02", "2027-08-29"],
+			["2028-07-02", "2028-08-28"],
+		],
+	};
+
+	const VACANCES_COLORS = {
+		"Vacances d'hiver (Noël)": "#1E90FF", // Bleu (Dodger Blue)
+		"Vacances de Carnaval": "#800080", // Violet (Purple)
+		"Vacances de printemps (Pâques)": "#32CD32", // Vert (Lime Green)
+		"Vacances d'été": "#FFA500", // Orange
+	};
+
 	function showMessage(text, duration = 3000) {
 		messageContainer.textContent = text;
 		messageContainer.classList.add("show");
@@ -46,7 +80,27 @@ document.addEventListener("DOMContentLoaded", () => {
 			messageContainer.classList.remove("show");
 		}, duration);
 	}
-	// style
+
+	// Fonction utilitaire pour vérifier si une date est dans une plage
+	function isDateInRange(dateStr, startStr, endStr) {
+		const date = new Date(dateStr);
+		const start = new Date(startStr);
+		const end = new Date(endStr);
+		return date >= start && date <= end;
+	}
+
+	// Fonction principale pour obtenir la couleur correspondant à la date
+	function getVacationColor(dateStr) {
+		for (const [vacName, ranges] of Object.entries(VACANCES)) {
+			for (const [start, end] of ranges) {
+				if (isDateInRange(dateStr, start, end)) {
+					return VACANCES_COLORS[vacName] || null;
+				}
+			}
+		}
+		return null; // Pas de vacances pour cette date
+	}
+
 	async function loadVotesAndRender() {
 		try {
 			const res = await fetch(`${BASE_URL}/votes`);
@@ -113,21 +167,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
 				const ul = document.createElement("ul");
 
-				selectedDates.sort().forEach((date) => {
+				selectedDates.sort().forEach((dateStr) => {
 					const li = document.createElement("li");
-					const [year, month, day] = date.slice(0, 10).split("-");
-					const formattedDate = `${day}/${month}/${year}`;
-					li.textContent = formattedDate;
+
+					const dateObj = new Date(dateStr);
+					const yyyy = dateObj.getFullYear();
+					const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
+					const dd = String(dateObj.getDate()).padStart(2, "0");
+					const formatted = `${dd}/${mm}/${yyyy}`;
+					const dateOnlyStr = `${yyyy}-${mm}-${dd}`;
+					const color = getVacationColor(dateOnlyStr);
+					li.textContent = formatted;
+					if (color) {
+						li.style.setProperty("color", color, "important");
+						li.style.setProperty("font-weight", "bold", "important");
+					}
+					console.log("VACANCES COLOR POUR", formatted, "=>", color);
 
 					if (
 						participants.length > 1 &&
-						dateCount[date] === participants.length
+						dateCount[dateStr] === participants.length
 					) {
 						li.classList.add("popular");
 						const span = document.createElement("span");
 						span.textContent = " Unanimité !";
 						li.appendChild(span);
 					}
+
 					ul.appendChild(li);
 				});
 

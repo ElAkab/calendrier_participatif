@@ -166,7 +166,7 @@ h1 {
 	cursor: pointer;
 }
 
-.calendar ul.dates li:active {
+.calendar ul.dates li:not(.vacances):active {
 	background: #000000;
 	color: #ccc;
 	cursor: pointer;
@@ -425,4 +425,34 @@ input.invalid {
 	color: white;
 	font-weight: bold;
 	border-radius: 5px;
+}
+
+.holiday-name {
+	margin-top: 10px;
+	text-align: center;
+	font-weight: bold;
+	transition: opacity 0.3s ease-in-out;
+}
+
+/* règle commune à toutes les vacances */
+[class^="vacances-"] {
+	border-radius: 0;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	position: relative;
+}
+
+/* style quand sélectionné */
+.selected[class^="vacances-"] {
+	background-blend-mode: multiply; /* mélange les couleurs */
+	filter: brightness(3);
+	box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+	color: #000000;
+	position: relative;
+}
+
+/* style quand actif */
+[class^="vacances-"]:active {
+	color: #fff;
+	/* éventuellement un effet plus sombre */
+	filter: brightness(0.9);
 }

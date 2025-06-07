@@ -184,8 +184,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		localStorage.removeItem("allUserNames");
 		localStorage.removeItem("userName");
 		localStorage.removeItem("selectedDates");
-
-		alert("Toutes les données ont été réinitialisées.");
+		localStorage.removeItem("calendarMonth");
+		localStorage.removeItem("calendarYear");
 
 		// Réinitialisation de l'affichage local (si modal etc. existent)
 		const modal = document.querySelector(".modal");
@@ -298,11 +298,119 @@ const months = [
 	"Décembre",
 ];
 
+const VACANCES_2025 = [
+	{
+		nom: "Vacances d'hiver (Noël)",
+		debut: "2024-12-22",
+		fin: "2025-01-04",
+	},
+	{
+		nom: "Vacances de Carnaval",
+		debut: "2025-02-24",
+		fin: "2025-03-09",
+	},
+	{
+		nom: "Vacances de printemps (Pâques)",
+		debut: "2025-04-28",
+		fin: "2025-05-11",
+	},
+	{
+		nom: "Vacances d'été",
+		debut: "2025-07-05",
+		fin: "2025-08-24",
+	},
+];
+
+const VACANCES_2026 = [
+	{
+		nom: "Vacances d'hiver (Noël)",
+		debut: "2025-12-22",
+		fin: "2026-01-02",
+	},
+	{
+		nom: "Vacances de Carnaval",
+		debut: "2026-02-14",
+		fin: "2026-03-01",
+	},
+	{
+		nom: "Vacances de printemps (Pâques)",
+		debut: "2026-04-25",
+		fin: "2026-05-10",
+	},
+	{
+		nom: "Vacances d'été",
+		debut: "2026-07-04",
+		fin: "2026-08-24",
+	},
+];
+
+const VACANCES_2027 = [
+	{
+		nom: "Vacances d'hiver (Noël)",
+		debut: "2026-12-27",
+		fin: "2027-01-03",
+	},
+	{
+		nom: "Vacances de Carnaval",
+		debut: "2027-02-15",
+		fin: "2027-02-21",
+	},
+	{
+		nom: "Vacances de printemps (Pâques)",
+		debut: "2027-04-05",
+		fin: "2027-04-18",
+	},
+	{
+		nom: "Vacances d'été",
+		debut: "2027-07-01",
+		fin: "2027-08-29",
+	},
+];
+
+const VACANCES_2028 = [
+	{
+		nom: "Vacances d'hiver (Noël)",
+		debut: "2027-12-25",
+		fin: "2028-01-02",
+	},
+	{
+		nom: "Vacances de Carnaval",
+		debut: "2028-02-28",
+		fin: "2028-03-05",
+	},
+	{
+		nom: "Vacances de printemps (Pâques)",
+		debut: "2028-03-27",
+		fin: "2028-04-09",
+	},
+	{
+		nom: "Vacances d'été",
+		debut: "2028-07-01",
+		fin: "2028-08-28",
+	},
+];
+
+const VACANCES_COLORS = {
+	"Vacances d'hiver (Noël)": "#1E90FF", // Bleu
+	"Vacances de Carnaval": "#800080", // Rose
+	"Vacances de printemps (Pâques)": "#32CD32", // Vert
+	"Vacances d'été": "#FFA500", // Orange
+};
+
 let date = new Date();
 let month = date.getMonth();
 let year = date.getFullYear();
 let selectedDates = [];
 let isRedirecting = false;
+
+// Récupérer mois et année sauvegardés (une seule fois)
+const savedMonth = localStorage.getItem("calendarMonth");
+const savedYear = localStorage.getItem("calendarYear");
+
+if (savedMonth !== null && savedYear !== null) {
+	month = parseInt(savedMonth, 10);
+	year = parseInt(savedYear, 10);
+}
 
 // Fonction pour mettre à jour le bouton de validation
 function updateValidateButton() {
@@ -313,6 +421,60 @@ function updateValidateButton() {
 		validateLabel.style.opacity = active ? 1 : 0.5;
 		validateLabel.style.cursor = active ? "pointer" : "not-allowed";
 	}
+}
+
+function updateVacancesStyle(color) {
+	const styleId = "vacances-dynamic-style";
+	let styleTag = document.getElementById(styleId);
+
+	if (!styleTag) {
+		styleTag = document.createElement("style");
+		styleTag.id = styleId;
+		document.head.appendChild(styleTag);
+	}
+
+	styleTag.textContent = `
+		.vacances {
+			background: linear-gradient(135deg, ${color}10, ${color}30);
+			border-radius: 0 !important;
+			box-shadow: 0 1px 3px ${color}40;
+			transition: transform 0.2s ease, box-shadow 0.2s ease;
+			position: relative;
+		}
+
+		.vacances:active {
+			background: ${color}30;
+			color: #ffffff;
+		}
+
+		.selected.vacances {
+			background: linear-gradient(135deg, ${color}20, ${color});
+			color: #ffffff;
+			box-shadow: 0 0 8px ${color}66;
+			position: relative;
+		}
+	`;
+}
+
+function normalizeDate(date) {
+	return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function getVacanceForDate(date) {
+	const allVacances = [
+		...VACANCES_2025,
+		...VACANCES_2026,
+		...VACANCES_2027,
+		...VACANCES_2028,
+	];
+	for (const vac of allVacances) {
+		const start = new Date(vac.debut);
+		const end = new Date(vac.fin);
+		if (date >= start && date <= end) {
+			return vac; // Retourne l’objet vacance
+		}
+	}
+	return null;
 }
 
 // Fonction pour ajouter un zéro devant les nombres inférieurs à 10
@@ -351,6 +513,70 @@ if (datesList && selectedDates.length > 0) {
 	});
 }
 
+function updateHolidayName() {
+	const holidayTitle = document.querySelector(".holiday-name");
+	const holidayDivider = document.querySelector(".holiday-divider");
+
+	const allVacances = [
+		...VACANCES_2025,
+		...VACANCES_2026,
+		...VACANCES_2027,
+		...VACANCES_2028,
+	];
+
+	let matchingHolidays = [];
+
+	allVacances.forEach((vacance) => {
+		const start = new Date(vacance.debut);
+		const end = new Date(vacance.fin);
+
+		if (
+			(year === start.getFullYear() && month === start.getMonth()) ||
+			(year === end.getFullYear() && month === end.getMonth()) ||
+			(year > start.getFullYear() && year < end.getFullYear()) ||
+			(year === start.getFullYear() &&
+				month > start.getMonth() &&
+				(year < end.getFullYear() || month <= end.getMonth()))
+		) {
+			matchingHolidays.push(vacance.nom);
+		}
+	});
+
+	if (holidayTitle && holidayDivider) {
+		if (matchingHolidays.length > 0) {
+			holidayDivider.style.display = "block";
+
+			if (matchingHolidays.length === 1) {
+				holidayTitle.textContent = matchingHolidays[0];
+				holidayTitle.style.color =
+					VACANCES_COLORS[matchingHolidays[0]] || "#000";
+				holidayTitle.style.opacity = 1;
+				holidayTitle.style.whiteSpace = "normal";
+			} else {
+				// Plusieurs vacances => un div par nom avec sa couleur propre
+				holidayTitle.innerHTML = matchingHolidays
+					.map(
+						(name, index) =>
+							`<div style="color:${VACANCES_COLORS[name] || "#000"};opacity:${
+								index === 0 ? 1 : 0.5
+							};white-space: normal;">${name}</div>`
+					)
+					.join("");
+			}
+		} else {
+			holidayDivider.style.display = "none";
+			holidayTitle.textContent = "";
+			holidayTitle.style.opacity = 0.4;
+			holidayTitle.style.color = "#000";
+		}
+	}
+
+	// Ici, tu passes la couleur du premier titre pour la mise en forme des vacances dans le calendrier
+	const firstHolidayName = matchingHolidays[0];
+	const color = VACANCES_COLORS[firstHolidayName] || "#50C878";
+	updateVacancesStyle(color);
+}
+
 // Fonction pour rendre les mois et les jours du calendrier
 function renderCalendar() {
 	const firstDayIndex = new Date(year, month, 1).getDay();
@@ -371,24 +597,39 @@ function renderCalendar() {
 		let currentDate = new Date(year, month, i);
 		let classes = [];
 
-		// Vérification si la date est aujourd'hui
 		if (currentDate.getTime() === today.getTime()) {
 			classes.push("today");
 		}
 
-		// Vérification si la date est dans le passé
 		let isPastDate = currentDate < today;
 		let key = `${year}-${pad(month + 1)}-${pad(i)}`;
 
-		// Ajout de la classe inactive si la date est dans le passé
 		if (isPastDate) {
 			classes.push("inactive");
 		} else if (selectedDates.includes(key)) {
 			classes.push("selected");
 		}
 
-		// Ajout de la classe pour les dates sélectionnées
-		datesHtml += `<li class="${classes.join(" ")}" data-day="${i}">${i}</li>`;
+		const vacance = getVacanceForDate(currentDate);
+		let styleAttr = "";
+
+		if (vacance) {
+			const vacName = vacance.nom.toLowerCase().replace(/\s+/g, "-");
+			classes.push(`vacances-${vacName}`);
+
+			const color = VACANCES_COLORS[vacance.nom] || "#50C878";
+
+			// Couleur appliquée en inline : effet de vacances
+			styleAttr = `style="
+		background: linear-gradient(135deg, ${color}10, ${color}30);
+		box-shadow: 0 1px 3px ${color}40;
+		border-radius: 0;
+	"`;
+		}
+
+		datesHtml += `<li class="${classes.join(
+			" "
+		)}" data-day="${i}" ${styleAttr}>${i}</li>`;
 	}
 
 	let endDay = lastDayIndex === 0 ? 6 : lastDayIndex - 1;
@@ -413,6 +654,8 @@ function renderCalendar() {
 		prevBtn.disabled = false;
 		prevBtn.classList.remove("disabled");
 	}
+
+	updateHolidayName();
 }
 
 // Ajout des gestionnaires d'événements pour les dates
@@ -434,6 +677,23 @@ function addDateClickHandlers() {
 			updateValidateButton();
 		});
 	});
+}
+
+function isDateInVacances(date) {
+	const allVacances = [
+		...VACANCES_2025,
+		...VACANCES_2026,
+		...VACANCES_2027,
+		...VACANCES_2028,
+	];
+	for (const vac of allVacances) {
+		const start = new Date(vac.debut);
+		const end = new Date(vac.fin);
+		if (date >= start && date <= end) {
+			return true;
+		}
+	}
+	return false;
 }
 
 function saveDatesForUser(userName, dates) {
@@ -469,6 +729,10 @@ navs.forEach((nav) => {
 			}
 		}
 
+		// Enregistrer la position actuelle dans le localStorage
+		localStorage.setItem("calendarMonth", month);
+		localStorage.setItem("calendarYear", year);
+
 		animateMonthChange(renderCalendar);
 	});
 });
@@ -476,6 +740,11 @@ navs.forEach((nav) => {
 // Gestion du bouton de validation
 validateBtn?.addEventListener("click", () => {
 	if (isRedirecting) return;
+	// 🔄 Recharge les dates sélectionnées depuis localStorage
+	const stored = localStorage.getItem("selectedDates");
+	if (stored) selectedDates = JSON.parse(stored);
+
+	// ✅ Vérifie les dates après mise à jour
 	if (selectedDates.length === 0) {
 		output.textContent = "Aucune date sélectionnée !";
 		return;
