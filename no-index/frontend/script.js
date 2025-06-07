@@ -210,6 +210,20 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 
 	checkName(); // Vérification du nom à l'ouverture de la page
+
+	// Requête pour récupérer les vacances
+	fetch(`${BASE_URL}/vacances/2025`)
+		.then((res) => {
+			if (!res.ok) throw new Error("Données non trouvées");
+			return res.json();
+		})
+		.then((vacances) => {
+			console.log("Vacances 2025 :", vacances);
+			// Affiche ou utilise les données ici
+		})
+		.catch((err) => {
+			console.error("Erreur récupération vacances :", err);
+		});
 });
 
 const nameInput = document.getElementById("name");
@@ -261,6 +275,21 @@ function sanitizeName(name) {
 		.map((word) => word[0].toUpperCase() + word.slice(1))
 		.join(" ");
 }
+
+let VACANCES = [];
+
+async function fetchVacances() {
+	try {
+		const res = await fetch(`${BASE_URL}/vacances/2025`); // adapte l’URL si besoin
+		if (!res.ok) throw new Error("Erreur lors de la récupération des vacances");
+		const data = await res.json();
+		VACANCES = data;
+		renderCalendar(); // appelle le rendu après avoir chargé les vacances
+	} catch (err) {
+		console.error("Impossible de charger les vacances :", err);
+	}
+}
+fetchVacances();
 
 // Gestion du calendrier
 const header = document.querySelector(".calendar h3");
@@ -577,6 +606,22 @@ function updateHolidayName() {
 	updateVacancesStyle(color);
 }
 
+function isDateInVacation(date) {
+	for (const vac of VACANCES) {
+		const debut = new Date(vac.debut);
+		const fin = new Date(vac.fin);
+
+		// Normalisation (heure à 0h)
+		debut.setHours(0, 0, 0, 0);
+		fin.setHours(0, 0, 0, 0);
+
+		if (date >= debut && date <= fin) {
+			return true;
+		}
+	}
+	return false;
+}
+
 // Fonction pour rendre les mois et les jours du calendrier
 function renderCalendar() {
 	const firstDayIndex = new Date(year, month, 1).getDay();
@@ -595,6 +640,8 @@ function renderCalendar() {
 	// Affichage des jours du mois courant
 	for (let i = 1; i <= daysInMonth; i++) {
 		let currentDate = new Date(year, month, i);
+		currentDate.setHours(0, 0, 0, 0); // Important pour la comparaison
+
 		let classes = [];
 
 		if (currentDate.getTime() === today.getTime()) {
