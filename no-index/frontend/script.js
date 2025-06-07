@@ -210,20 +210,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 
 	checkName(); // Vérification du nom à l'ouverture de la page
-
-	// Requête pour récupérer les vacances
-	fetch(`${BASE_URL}/vacances/2025`)
-		.then((res) => {
-			if (!res.ok) throw new Error("Données non trouvées");
-			return res.json();
-		})
-		.then((vacances) => {
-			console.log("Vacances 2025 :", vacances);
-			// Affiche ou utilise les données ici
-		})
-		.catch((err) => {
-			console.error("Erreur récupération vacances :", err);
-		});
 });
 
 const nameInput = document.getElementById("name");
