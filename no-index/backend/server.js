@@ -33,18 +33,6 @@ app.use(
 	express.static(path.join(__dirname, "..", "frontend", "Résultats_public"))
 );
 
-// Import des vacances
-const VACANCES = require("./vacances");
-
-// API vacances
-app.get("/vacances/:annee", (req, res) => {
-	const annee = req.params.annee;
-	if (!VACANCES[annee]) {
-		return res.status(404).json({ message: "Aucune donnée pour cette année" });
-	}
-	res.json(VACANCES[annee]);
-});
-
 // Route pour index.html à la racine
 app.get("/", (req, res) => {
 	res.sendFile(path.join(__dirname, "..", "frontend", "index.html"));
