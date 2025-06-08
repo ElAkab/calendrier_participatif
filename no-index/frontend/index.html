@@ -25,8 +25,26 @@
 				<p id="nameMessage" class="error-message"></p>
 			</div>
 		</div>
+		<div
+			id="loader"
+			style="
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				font-size: 2rem;
+				background: white;
+				padding: 1rem 2rem;
+				border-radius: 8px;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+				display: none;
+				z-index: 1000;
+			"
+		>
+			⏳ Chargement...
+		</div>
 
-		<h1>Choisissez vos dates</h1>
+		<h1>Choisis tes dates</h1>
 		<div class="calendar">
 			<header>
 				<button id="prev" aria-label="Mois précédent"></button>

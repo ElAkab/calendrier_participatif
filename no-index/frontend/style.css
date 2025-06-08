@@ -93,6 +93,7 @@ body {
 	border-radius: 50%;
 	transform: rotate(5deg);
 	animation: bounce 2s infinite ease-in-out;
+	transition: opacity 0.3s ease-in-out;
 }
 
 @keyframes bounce {
@@ -103,6 +104,10 @@ body {
 	50% {
 		transform: rotate(5deg) translateY(-5px);
 	}
+}
+
+.bounce {
+	animation: bounce 1.5s ease-in-out infinite;
 }
 
 h1 {
@@ -316,6 +321,10 @@ h1 {
 	width: 30px;
 	opacity: 1;
 	animation: spin 1s linear infinite;
+}
+
+.spin {
+	animation: spin 3s linear infinite;
 }
 
 /* Spin */

@@ -214,7 +214,7 @@ app.delete("/delete-user/:userName", async (req, res) => {
 	const userName = req.params.userName;
 	console.log("🔴 Demande de suppression de :", userName);
 
-	// Supprimer côté mémoire (optionnel selon ton usage)
+	// Supprimer côté mémoire
 	const index = participants.findIndex((p) => p.userName === userName);
 	if (index !== -1) {
 		participants.splice(index, 1);
@@ -224,14 +224,18 @@ app.delete("/delete-user/:userName", async (req, res) => {
 		});
 	}
 
-	// Supprimer en base dans "users" (et plus "votes" si c'est bien là que tu stockes les prénoms)
 	try {
+		// Supprimer les votes de l'utilisateur
+		await pool.query("DELETE FROM votes WHERE user_name = $1", [userName]);
+
+		// Supprimer l'utilisateur dans la table users
 		await pool.query("DELETE FROM users WHERE name = $1", [userName]);
-		console.log("✅ Utilisateur supprimé dans la table users :", userName);
-		res.json({ message: "Utilisateur supprimé avec succès." });
+
+		console.log("✅ Votes + utilisateur supprimés :", userName);
+		res.json({ message: "Utilisateur et votes supprimés avec succès." });
 	} catch (error) {
 		console.error("❌ Erreur suppression en base :", error);
-		res.status(500).json({ message: "Erreur serveur", error: error.message });
+		res.status(500).json({ message: "Erreur serveur" });
 	}
 });
 

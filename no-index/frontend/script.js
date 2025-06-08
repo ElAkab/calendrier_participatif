@@ -16,10 +16,52 @@ function safeParseJSON(raw) {
 
 document.addEventListener("DOMContentLoaded", () => {
 	const modal = document.getElementById("welcomeModal");
+	const talkingWheel = document.querySelector(".talking-wheel");
+	const p = document.querySelector("#welcomeModal p");
 	const input = document.getElementById("userNameInput");
 	const btn = document.getElementById("submitNameBtn");
 	const nameMessage = document.getElementById("nameMessage");
 	const resetBtn = document.getElementById("resetNamesBtn");
+	let lastPlaceholder = null;
+
+	function togglePageInteraction(disabled) {
+		document.body.style.pointerEvents = disabled ? "none" : "auto";
+		document.body.style.opacity = disabled ? "0.6" : "1";
+	}
+
+	function showLoader(show) {
+		const loader = document.getElementById("loader");
+		if (loader) loader.style.display = show ? "block" : "none";
+	}
+
+	// Liste autorisée
+	const users = [
+		{ names: ["Ali"], placeholder: "C'est Ali ?" },
+		{ names: ["Hadja"], placeholder: "C'est Hadja ?" },
+		{ names: ["Mateusz"], placeholder: "C'est Mateusz ?" },
+		{ names: ["Nisrine"], placeholder: "C'est Nisrine ?" },
+		{ names: ["Anas"], placeholder: "C'est Anas ?" },
+		{ names: ["Winnie"], placeholder: "C'est Winnie ?" },
+		{
+			names: ["Adam", "Adam Lamarti", "Adam (L)", "Adam L", "Adam La"],
+			placeholder: "C'est Adam (L) ?",
+			maxVotes: 2,
+		},
+		{ names: ["Salma"], placeholder: "C'est Salma ?" },
+		{ names: ["Mohammed"], placeholder: "C'est Mohammed ?" },
+		{ names: ["Myriam"], placeholder: "C'est Myriam ?" },
+		{ names: ["Bilal"], placeholder: "C'est Bilal ?" },
+	];
+
+	const allUsedNames = getAllNames().map((n) => n.toLowerCase());
+	const availableUsers = users.filter((user) =>
+		user.names.every((name) => !allUsedNames.includes(name.toLowerCase()))
+	);
+
+	function getAllNames() {
+		const raw = localStorage.getItem("allUserNames");
+		return raw ? JSON.parse(raw) : [];
+	}
 
 	if (!modal || !input || !btn || !nameMessage || !resetBtn) return;
 
@@ -54,41 +96,21 @@ document.addEventListener("DOMContentLoaded", () => {
 	} else {
 		modal.classList.add("active");
 		if (availableUsers.length > 0) {
-			const randomUser =
-				availableUsers[Math.floor(Math.random() * availableUsers.length)];
+			let randomUser;
+			do {
+				randomUser =
+					availableUsers[Math.floor(Math.random() * availableUsers.length)];
+			} while (
+				availableUsers.length > 1 &&
+				randomUser.placeholder === lastPlaceholder
+			);
+
 			input.placeholder = randomUser.placeholder;
+			lastPlaceholder = randomUser.placeholder;
 		} else {
 			input.placeholder = "C'est toi ?";
+			lastPlaceholder = "C'est toi ?";
 		}
-	}
-
-	// Liste autorisée
-	const users = [
-		{ names: ["Ali"], placeholder: "C'est Ali ?" },
-		{ names: ["Hadja"], placeholder: "C'est Hadja ?" },
-		{ names: ["Mateusz"], placeholder: "C'est Mateusz ?" },
-		{ names: ["Nisrine"], placeholder: "C'est Nisrine ?" },
-		{ names: ["Anas"], placeholder: "C'est Anas ?" },
-		{ names: ["Winnie"], placeholder: "C'est Winnie ?" },
-		{
-			names: ["Adam", "Adam Lamarti", "Adam (L)", "Adam L", "Adam La"],
-			placeholder: "C'est Adam (L) ?",
-			maxVotes: 2,
-		},
-		{ names: ["Salma"], placeholder: "C'est Salma ?" },
-		{ names: ["Mohammed"], placeholder: "C'est Mohammed ?" },
-		{ names: ["Myriam"], placeholder: "C'est Myriam ?" },
-		{ names: ["Bilal"], placeholder: "C'est Bilal ?" },
-	];
-
-	const allUsedNames = getAllNames().map((n) => n.toLowerCase());
-	const availableUsers = users.filter((user) =>
-		user.names.every((name) => !allUsedNames.includes(name.toLowerCase()))
-	);
-
-	function getAllNames() {
-		const raw = localStorage.getItem("allUserNames");
-		return raw ? JSON.parse(raw) : [];
 	}
 
 	function saveName(name) {
@@ -106,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	btn.addEventListener("click", async () => {
 		input.classList.remove("invalid");
-		nameMessage.style.color = "#e74c3c"; //
+		nameMessage.style.color = "#e74c3c";
 		nameMessage.textContent = "";
 
 		const name = input.value.trim();
@@ -123,6 +145,18 @@ document.addEventListener("DOMContentLoaded", () => {
 			alert("Connais pas...");
 			return;
 		}
+
+		// Ajout animation + désactivation
+		setTimeout(() => {
+			talkingWheel.style.opacity = "1"; // ça déclenche la transition CSS
+			setTimeout(() => {
+				talkingWheel.classList.add("spin"); // start animation après la transition
+			}, 310); // un tout petit plus que 300ms pour être sûr
+		}, 0);
+		p.textContent = `Vérification`;
+		input.disabled = true;
+		btn.disabled = true;
+		input.disabled = true;
 
 		try {
 			const responseIsTaken = await fetch(`${BASE_URL}/is-name-taken`, {
@@ -161,11 +195,17 @@ document.addEventListener("DOMContentLoaded", () => {
 			localStorage.setItem("userName", name);
 			saveName(name);
 			modal.classList.remove("active");
+			alert(`Bienvenue, ${name} ! 🎉`);
 			console.log(`On dirait bien que c'est, ${name} 😱 !`);
 		} catch (err) {
 			console.error("Erreur lors du traitement du prénom :", err);
 			nameMessage.textContent = "Erreur serveur. Réessaie plus tard.";
 			input.classList.add("invalid");
+		} finally {
+			// On arrête l'animation et on réactive bouton + input
+			talkingWheel.classList.remove("spin");
+			btn.disabled = false;
+			input.disabled = false;
 		}
 
 		input.focus();
@@ -187,6 +227,9 @@ document.addEventListener("DOMContentLoaded", () => {
 			return;
 		}
 
+		togglePageInteraction(true);
+		showLoader(true);
+
 		const userName = localStorage.getItem("userName");
 
 		if (userName) {
@@ -207,6 +250,9 @@ document.addEventListener("DOMContentLoaded", () => {
 				alert(
 					"Impossible de supprimer les données serveur. Réessaie plus tard."
 				);
+
+				togglePageInteraction(false);
+				showLoader(false);
 				return;
 			}
 		}
@@ -217,18 +263,24 @@ document.addEventListener("DOMContentLoaded", () => {
 		localStorage.removeItem("calendarMonth");
 		localStorage.removeItem("calendarYear");
 
-		modal.classList.add("active");
-		input.value = "";
-		input.classList.remove("invalid");
-		nameMessage.textContent = "";
+		// Affiche le loader un court instant avant de faire quoi que ce soit
+		setTimeout(() => {
+			modal.classList.add("active");
+			input.value = "";
+			input.classList.remove("invalid");
+			nameMessage.textContent = "";
 
-		const allSelected = document.querySelectorAll(".selected");
-		allSelected.forEach((el) => el.classList.remove("selected"));
+			const allSelected = document.querySelectorAll(".selected");
+			allSelected.forEach((el) => el.classList.remove("selected"));
 
-		const output = document.querySelector("#output");
-		if (output) output.textContent = "";
+			const output = document.querySelector("#output");
+			if (output) output.textContent = "";
+		}, 50); // délai court pour laisser le temps au loader d'apparaître
 
-		location.reload();
+		// Recharge la page après une courte pause (optionnel, laisse le temps au loader de s'afficher visuellement)
+		setTimeout(() => {
+			location.reload();
+		}, 10);
 	});
 });
 
