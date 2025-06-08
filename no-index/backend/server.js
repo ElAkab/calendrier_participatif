@@ -211,6 +211,8 @@ app.delete("/clear", async (req, res) => {
 
 // --- Suppression d'un participant ---
 app.delete("/delete-user/:userName", async (req, res) => {
+	console.log("Suppression reçue pour :", userName);
+
 	const userName = req.params.userName;
 
 	if (!userName || typeof userName !== "string") {

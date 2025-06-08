@@ -170,6 +170,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		if (userName) {
 			try {
+				console.log("Tentative suppression de :", userName);
 				const res = await fetch(
 					`${BASE_URL}/delete-user/${encodeURIComponent(userName)}`,
 					{
