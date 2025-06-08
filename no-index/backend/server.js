@@ -144,14 +144,36 @@ app.get("/votes", async (req, res) => {
 	}
 });
 
+app.post("/register-user", async (req, res) => {
+	try {
+		const { name } = req.body;
+		if (!name) return res.status(400).json({ error: "Nom manquant" });
+
+		// Vérifier si le nom existe déjà
+		const checkQuery = "SELECT COUNT(*) FROM users WHERE LOWER(name) = $1";
+		const checkResult = await pool.query(checkQuery, [name.toLowerCase()]);
+		if (parseInt(checkResult.rows[0].count, 10) > 0) {
+			return res.status(409).json({ error: "Nom déjà pris" });
+		}
+
+		// Insérer le nom
+		const insertQuery = "INSERT INTO users (name) VALUES ($1)";
+		await pool.query(insertQuery, [name]);
+
+		res.status(201).json({ message: "Utilisateur enregistré" });
+	} catch (error) {
+		console.error("Erreur lors de l'enregistrement utilisateur :", error);
+		res.status(500).json({ error: "Erreur serveur" });
+	}
+});
+
 app.post("/is-name-taken", async (req, res) => {
-	console.log("Corps reçu :", req.body); // <- Ajoute ça pour debug
+	console.log("Corps reçu :", req.body);
 
 	try {
 		const { name } = req.body;
 		if (!name) return res.status(400).json({ error: "Nom manquant" });
 
-		// Exemple de requête SQL pour vérifier si le nom existe
 		const query = "SELECT COUNT(*) FROM users WHERE LOWER(name) = $1";
 		const values = [name.toLowerCase()];
 

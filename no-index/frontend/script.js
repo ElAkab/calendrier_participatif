@@ -102,27 +102,52 @@ document.addEventListener("DOMContentLoaded", () => {
 			return;
 		}
 
-		let taken = false;
 		try {
-			taken = await isNameTaken(name);
+			// Vérifier si le nom est déjà pris
+			const responseIsTaken = await fetch(`${BASE_URL}/is-name-taken`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ name }),
+			});
+
+			if (!responseIsTaken.ok) throw new Error("Erreur réseau");
+
+			const dataIsTaken = await responseIsTaken.json();
+
+			if (dataIsTaken.isTaken) {
+				alert(
+					"Ce prénom a déjà été utilisé. Merci de ne pas voter plusieurs fois."
+				);
+				nameMessage.textContent =
+					"Ce prénom a déjà été utilisé. Merci de ne pas voter plusieurs fois.";
+				input.classList.add("invalid");
+				return;
+			}
+
+			// Enregistrer le nom côté serveur via /register-user
+			const responseRegister = await fetch(`${BASE_URL}/register-user`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ name }),
+			});
+
+			if (!responseRegister.ok) {
+				const errorData = await responseRegister.json();
+				throw new Error(
+					errorData.error || "Erreur serveur lors de l'enregistrement"
+				);
+			}
+
+			// Tout est OK, on stocke le nom en localStorage
+			localStorage.setItem("userName", name);
+			saveName(name);
+			modal.classList.remove("active");
+			console.log(`On dirait bien que c'est, ${name} 😱 !`);
 		} catch (err) {
-			console.error("Erreur lors de la vérification du nom :", err);
+			console.error("Erreur lors du traitement du prénom :", err);
 			nameMessage.textContent = "Erreur serveur. Réessaie plus tard.";
 			input.classList.add("invalid");
-			return;
 		}
-
-		if (taken) {
-			nameMessage.textContent =
-				"Ce prénom a déjà été utilisé. Merci de ne pas voter plusieurs fois.";
-			input.classList.add("invalid");
-			return;
-		}
-
-		localStorage.setItem("userName", name);
-		saveName(name);
-		modal.classList.remove("active");
-		console.log(`On dirait bien que c'est, ${name} 😱 !`);
 	});
 
 	input.addEventListener("keydown", (event) => {
