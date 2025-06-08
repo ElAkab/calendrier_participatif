@@ -69,7 +69,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	// Étape 1 – Vérifier si l'utilisateur existe toujours côté serveur
 	if (userName) {
-		fetch(`${BASE_URL}/is-name-taken/${encodeURIComponent(userName)}`)
+		fetch(`${BASE_URL}/is-name-taken`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ name: userName }),
+		})
 			.then((res) => res.json())
 			.then((data) => {
 				if (!data.isTaken) {
