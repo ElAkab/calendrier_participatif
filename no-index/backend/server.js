@@ -85,7 +85,10 @@ app.post("/submit-dates", async (req, res) => {
 			.status(200)
 			.json({ message: "Données bien reçues et enregistrées en base !" });
 	} catch (error) {
-		console.error("Erreur lors de la mise à jour en base :", error);
+		console.error(
+			"Erreur lors de la mise à jour en base :",
+			error + "Je répare ça le plus vite possible !"
+		);
 		res.status(500).json({ message: "Erreur serveur lors de la sauvegarde." });
 	}
 });
@@ -133,8 +136,32 @@ app.get("/votes", async (req, res) => {
 
 		res.json(result);
 	} catch (error) {
-		console.error("Erreur récupération données :", error);
+		console.error(
+			"Erreur récupération données :",
+			error + "Je répare ça le plus vite possible !"
+		);
 		res.status(500).json({ message: "Erreur serveur" });
+	}
+});
+
+app.post("/is-name-taken", async (req, res) => {
+	console.log("Corps reçu :", req.body); // <- Ajoute ça pour debug
+
+	try {
+		const { name } = req.body;
+		if (!name) return res.status(400).json({ error: "Nom manquant" });
+
+		// Exemple de requête SQL pour vérifier si le nom existe
+		const query = "SELECT COUNT(*) FROM users WHERE LOWER(name) = $1";
+		const values = [name.toLowerCase()];
+
+		const result = await pool.query(query, values);
+		const count = parseInt(result.rows[0].count, 10);
+
+		return res.json({ isTaken: count > 0 });
+	} catch (err) {
+		console.error("Erreur serveur :", err);
+		return res.status(500).json({ error: "Erreur serveur" });
 	}
 });
 
@@ -152,7 +179,10 @@ app.delete("/clear", async (req, res) => {
 
 		res.send("Données supprimées");
 	} catch (err) {
-		console.error("Erreur suppression :", err);
+		console.error(
+			"Erreur suppression :",
+			err + "Je répare ça le plus vite possible !"
+		);
 		res.status(500).send("Erreur serveur");
 	}
 });
@@ -181,10 +211,6 @@ app.delete("/delete-user/:userName", async (req, res) => {
 	}
 
 	res.json({ message: "Utilisateur supprimé avec succès." });
-});
-
-app.get("/", (req, res) => {
-	res.send("Bienvenue sur l'API du calendrier participatif !");
 });
 
 // --- Routes statiques pour fichiers front ---

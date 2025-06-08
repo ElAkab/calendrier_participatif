@@ -436,14 +436,6 @@ h2 {
 	text-align: center;
 }
 
-.vacation {
-	background: linear-gradient(135deg, #e6fff2, #c0fede); /* Vert très clair */
-	border-radius: 0 !important;
-	box-shadow: 0 1px 3px rgba(80, 200, 120, 0.2); /* Ombre verte légère */
-	transition: transform 0.2s ease, box-shadow 0.2s ease;
-	position: relative;
-}
-
 .holiday-name {
 	margin-top: 10px;
 	text-align: center;

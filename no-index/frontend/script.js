@@ -23,6 +23,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	if (!modal || !input || !btn || !nameMessage || !resetBtn) return;
 
+	// Si un prénom est déjà stocké, on cache le modal, sinon on l'affiche
+	const storedName = localStorage.getItem("userName");
+	if (storedName) {
+		modal.classList.remove("active");
+		console.log(`Prénom déjà stocké : ${storedName}`);
+	} else {
+		modal.classList.add("active");
+	}
+
 	const users = [
 		{ names: ["Ali"], placeholder: "C'est Ali ?" },
 		{ names: ["Hadja"], placeholder: "C'est Hadja ?" },
@@ -41,39 +50,17 @@ document.addEventListener("DOMContentLoaded", () => {
 		{ names: ["Bilal"], placeholder: "C'est Bilal ?" },
 	];
 
-	// Récupération des votes stockés
-	const allNamesRaw = localStorage.getItem("allUserNames") || "[]";
-	const allNames = JSON.parse(allNamesRaw).map((n) => n.trim().toLowerCase());
-
-	// Filtrer les utilisateurs disponibles
-	const availableUsers = users.filter((user) => {
-		const maxVotes = user.maxVotes || 1;
-		const count = allNames.filter((name) =>
-			user.names.some((n) => n.trim().toLowerCase() === name)
-		).length;
-		return count < maxVotes;
-	});
-	// Si aucun utilisateur n'est disponible, on affiche un message
-	const randomIndex = Math.floor(Math.random() * availableUsers.length);
-	input.placeholder =
-		availableUsers.length > 0
-			? availableUsers[randomIndex].placeholder
-			: "Plus de prénoms disponibles";
-
-	// Fonction pour récupérer tous les noms stockés
 	function getAllNames() {
 		const raw = localStorage.getItem("allUserNames");
 		return raw ? JSON.parse(raw) : [];
 	}
 
-	// Fonction pour sauvegarder un nom
 	function saveName(name) {
 		const allNames = getAllNames();
 		allNames.push(name);
 		localStorage.setItem("allUserNames", JSON.stringify(allNames));
 	}
 
-	// Vérification si le nom est autorisé
 	function isAllowedName(inputName) {
 		const lower = inputName.trim().toLowerCase();
 		return users.some((user) =>
@@ -81,40 +68,20 @@ document.addEventListener("DOMContentLoaded", () => {
 		);
 	}
 
-	// Vérification si le nom est déjà pris
-	function isNameTaken(inputName) {
-		const lower = inputName.trim().toLowerCase();
-		const allNames = getAllNames().map((n) => n.trim().toLowerCase());
+	async function isNameTaken(name) {
+		const response = await fetch(`${BASE_URL}/is-name-taken`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ name }),
+		});
 
-		const user = users.find((user) =>
-			user.names.some((n) => n.toLowerCase() === lower)
-		);
-		if (!user) return true;
+		if (!response.ok) throw new Error("Erreur réseau");
 
-		const maxVotes = user.maxVotes || 1;
-		const count = allNames.filter((n) =>
-			user.names.some((variant) => variant.toLowerCase() === n)
-		).length;
-
-		return count >= maxVotes;
+		const data = await response.json();
+		return data.isTaken;
 	}
 
-	// Vérification du nom stocké
-	function checkName() {
-		const storedName = localStorage.getItem("userName");
-		if (!storedName) {
-			modal.classList.add("active");
-			nameMessage.textContent = "";
-			input.classList.remove("invalid");
-			input.focus();
-		} else {
-			modal.classList.remove("active");
-			console.log(`Bienvenue de nouveau, ${storedName} !`);
-		}
-	}
-
-	// Gestion des événements du modal
-	btn.addEventListener("click", () => {
+	btn.addEventListener("click", async () => {
 		input.classList.remove("invalid");
 		nameMessage.style.color = "#e74c3c";
 		nameMessage.textContent = "";
@@ -134,7 +101,17 @@ document.addEventListener("DOMContentLoaded", () => {
 			return;
 		}
 
-		if (isNameTaken(name)) {
+		let taken = false;
+		try {
+			taken = await isNameTaken(name);
+		} catch (err) {
+			console.error("Erreur lors de la vérification du nom :", err);
+			nameMessage.textContent = "Erreur serveur. Réessaie plus tard.";
+			input.classList.add("invalid");
+			return;
+		}
+
+		if (taken) {
 			nameMessage.textContent =
 				"Ce prénom a déjà été utilisé. Merci de ne pas voter plusieurs fois.";
 			input.classList.add("invalid");
@@ -147,7 +124,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		console.log(`On dirait bien que c'est, ${name} 😱 !`);
 	});
 
-	// Gestion de l'événement de validation du modal
 	input.addEventListener("keydown", (event) => {
 		if (event.key === "Enter") {
 			event.preventDefault();
@@ -155,14 +131,13 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
-	// Gestion du bouton de réinitialisation
 	resetBtn.addEventListener("click", () => {
 		if (
 			!confirm(
 				"Cette action supprimera toutes les données (prénom et dates), idéal pour recommencer 🤔.. \n\nT'es sûr ?"
 			)
 		) {
-			return; // On annule l'action si l'utilisateur clique sur "Annuler"
+			return;
 		}
 
 		const userName = localStorage.getItem("userName");
@@ -180,25 +155,16 @@ document.addEventListener("DOMContentLoaded", () => {
 				});
 		}
 
-		// Nettoyage local
 		localStorage.removeItem("allUserNames");
 		localStorage.removeItem("userName");
 		localStorage.removeItem("selectedDates");
 		localStorage.removeItem("calendarMonth");
 		localStorage.removeItem("calendarYear");
 
-		// Réinitialisation de l'affichage local (si modal etc. existent)
-		const modal = document.querySelector(".modal");
-		if (modal) modal.classList.add("active");
-
-		const input = document.querySelector("#name-input");
-		if (input) {
-			input.value = "";
-			input.classList.remove("invalid");
-		}
-
-		const nameMessage = document.querySelector("#name-message");
-		if (nameMessage) nameMessage.textContent = "";
+		modal.classList.add("active");
+		input.value = "";
+		input.classList.remove("invalid");
+		nameMessage.textContent = "";
 
 		const allSelected = document.querySelectorAll(".selected");
 		allSelected.forEach((el) => el.classList.remove("selected"));
@@ -208,8 +174,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		location.reload();
 	});
-
-	checkName(); // Vérification du nom à l'ouverture de la page
 });
 
 const nameInput = document.getElementById("name");
@@ -261,21 +225,6 @@ function sanitizeName(name) {
 		.map((word) => word[0].toUpperCase() + word.slice(1))
 		.join(" ");
 }
-
-let VACANCES = [];
-
-async function fetchVacances() {
-	try {
-		const res = await fetch(`${BASE_URL}/vacances/2025`); // adapte l’URL si besoin
-		if (!res.ok) throw new Error("Erreur lors de la récupération des vacances");
-		const data = await res.json();
-		VACANCES = data;
-		renderCalendar(); // appelle le rendu après avoir chargé les vacances
-	} catch (err) {
-		console.error("Impossible de charger les vacances :", err);
-	}
-}
-fetchVacances();
 
 // Gestion du calendrier
 const header = document.querySelector(".calendar h3");
@@ -331,7 +280,7 @@ const VACANCES_2025 = [
 	},
 	{
 		nom: "Vacances d'été",
-		debut: "2025-07-05",
+		debut: "2025-07-04",
 		fin: "2025-08-24",
 	},
 ];
@@ -344,17 +293,17 @@ const VACANCES_2026 = [
 	},
 	{
 		nom: "Vacances de Carnaval",
-		debut: "2026-02-14",
+		debut: "2026-02-13",
 		fin: "2026-03-01",
 	},
 	{
 		nom: "Vacances de printemps (Pâques)",
-		debut: "2026-04-25",
+		debut: "2026-04-24",
 		fin: "2026-05-10",
 	},
 	{
 		nom: "Vacances d'été",
-		debut: "2026-07-04",
+		debut: "2026-07-03",
 		fin: "2026-08-24",
 	},
 ];
@@ -367,12 +316,12 @@ const VACANCES_2027 = [
 	},
 	{
 		nom: "Vacances de Carnaval",
-		debut: "2027-02-15",
+		debut: "2027-02-14",
 		fin: "2027-02-21",
 	},
 	{
 		nom: "Vacances de printemps (Pâques)",
-		debut: "2027-04-05",
+		debut: "2027-04-04",
 		fin: "2027-04-18",
 	},
 	{
@@ -390,17 +339,17 @@ const VACANCES_2028 = [
 	},
 	{
 		nom: "Vacances de Carnaval",
-		debut: "2028-02-28",
+		debut: "2028-02-25",
 		fin: "2028-03-05",
 	},
 	{
 		nom: "Vacances de printemps (Pâques)",
-		debut: "2028-03-27",
+		debut: "2028-03-24",
 		fin: "2028-04-09",
 	},
 	{
 		nom: "Vacances d'été",
-		debut: "2028-07-01",
+		debut: "2028-07-",
 		fin: "2028-08-28",
 	},
 ];
@@ -839,7 +788,7 @@ validateBtn?.addEventListener("click", () => {
 		.catch((err) => {
 			console.error("Erreur lors de la communication avec le serveur :", err);
 			output.textContent =
-				"Erreur lors de la communication avec le serveur. Veuillez réessayer.";
+				"Erreur lors de la communication avec le serveur. Je répare ça le plus vite possible !.";
 
 			validateBtn.disabled = false;
 			validateBtn.style.cursor = "pointer";

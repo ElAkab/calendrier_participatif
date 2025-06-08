@@ -205,7 +205,9 @@ document.addEventListener("DOMContentLoaded", () => {
 			resultList.appendChild(container);
 		} catch (err) {
 			console.error("Erreur lors du chargement des votes :", err);
-			showMessage("Erreur de chargement des résultats. Réessaie plus tard.");
+			showMessage(
+				"Erreur de chargement des résultats, je répare ça le plus vite possible !"
+			);
 		}
 	}
 

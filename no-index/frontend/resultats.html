@@ -81,7 +81,8 @@
 					.catch((err) => {
 						console.error("Erreur :", err);
 						list.innerHTML =
-							"<li>Erreur lors du chargement des données.</li>" + err;
+							"<li>Erreur lors du chargement des données. Je répare ça le plus vite possible !</li>" +
+							err;
 					});
 			}
 
@@ -122,7 +123,9 @@
 							})
 							.catch((err) => {
 								console.error(err);
-								alert("Erreur de connexion au serveur.");
+								alert(
+									"Erreur de connexion au serveur. Je répare ça le plus vite possible !"
+								);
 							});
 					}
 				});
@@ -143,7 +146,11 @@
 							location.reload();
 						})
 						.catch((err) => {
-							alert("❌ Une erreur est survenue : " + err.message);
+							alert(
+								"❌ Une erreur est survenue : " +
+									err.message +
+									"Je répare ça le plus vite possible !"
+							);
 						});
 				}
 			}
@@ -169,7 +176,9 @@
 							})
 							.catch((err) => {
 								console.error(err);
-								alert("Erreur lors de la suppression.");
+								alert(
+									"Erreur lors de la suppression. Je répare ça le plus vite possible !"
+								);
 							});
 					}
 				});
