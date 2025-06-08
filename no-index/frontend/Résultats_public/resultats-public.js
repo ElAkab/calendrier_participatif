@@ -9,10 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	const resultList = document.getElementById("result-list");
 	const messageContainer = document.getElementById("message-container");
-	const BASE_URL =
-		window.location.hostname === "localhost"
-			? "http://localhost:3000"
-			: "https://calendrier-participatif-backend.onrender.com";
+	const BASE_URL = window.location.hostname.includes("test-modifs") // ou une autre partie de l’URL Netlify de test
+		? "https://calendrier-participatif-backend-test.onrender.com"
+		: window.location.hostname === "localhost"
+		? "http://localhost:3000"
+		: "https://calendrier-participatif-backend.onrender.com";
 
 	const users = [
 		{ names: ["Ali"], placeholder: "C'est Ali ?" },

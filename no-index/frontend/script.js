@@ -1,9 +1,10 @@
 console.log("JS chargé");
 
-const BASE_URL =
-	window.location.hostname === "localhost"
-		? "http://localhost:3000"
-		: "https://calendrier-participatif-backend.onrender.com";
+const BASE_URL = window.location.hostname.includes("test-modifs") // ou une autre partie de l’URL Netlify de test
+	? "https://calendrier-participatif-backend-test.onrender.com"
+	: window.location.hostname === "localhost"
+	? "http://localhost:3000"
+	: "https://calendrier-participatif-backend.onrender.com";
 
 function safeParseJSON(raw) {
 	try {
