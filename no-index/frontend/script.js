@@ -14,7 +14,6 @@ function safeParseJSON(raw) {
 	}
 }
 
-// Gestion du modal de bienvenue
 document.addEventListener("DOMContentLoaded", () => {
 	const modal = document.getElementById("welcomeModal");
 	const input = document.getElementById("userNameInput");
@@ -24,15 +23,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	if (!modal || !input || !btn || !nameMessage || !resetBtn) return;
 
-	// Si un prénom est déjà stocké, on cache le modal, sinon on l'affiche
-	const storedName = localStorage.getItem("userName");
-	if (storedName) {
-		modal.classList.remove("active");
-		console.log(`Prénom déjà stocké : ${storedName}`);
-	} else {
-		modal.classList.add("active");
+	const userName = localStorage.getItem("userName");
+
+	// Étape 1 – Vérifier si l'utilisateur existe toujours côté serveur
+	if (userName) {
+		fetch(`${BASE_URL}/is-name-taken/${encodeURIComponent(userName)}`)
+			.then((res) => res.json())
+			.then((data) => {
+				if (!data.isTaken) {
+					console.warn(
+						`👻 L'utilisateur ${userName} n'existe plus côté serveur. Réinitialisation.`
+					);
+					localStorage.removeItem("userName");
+					localStorage.removeItem("selectedDates");
+					localStorage.removeItem("allUserNames");
+					localStorage.removeItem("calendarMonth");
+					localStorage.removeItem("calendarYear");
+					location.reload();
+				}
+			})
+			.catch((err) => {
+				console.error("Erreur lors de la vérification du nom :", err);
+			});
 	}
 
+	// Étape 2 – Modal : affichage ou non selon présence du nom
+	if (userName) {
+		modal.classList.remove("active");
+		console.log(`Prénom déjà stocké : ${userName}`);
+	} else {
+		modal.classList.add("active");
+		if (availableUsers.length > 0) {
+			const randomUser =
+				availableUsers[Math.floor(Math.random() * availableUsers.length)];
+			input.placeholder = randomUser.placeholder;
+		} else {
+			input.placeholder = "C'est toi ?";
+		}
+	}
+
+	// Liste autorisée
 	const users = [
 		{ names: ["Ali"], placeholder: "C'est Ali ?" },
 		{ names: ["Hadja"], placeholder: "C'est Hadja ?" },
@@ -50,6 +80,11 @@ document.addEventListener("DOMContentLoaded", () => {
 		{ names: ["Myriam"], placeholder: "C'est Myriam ?" },
 		{ names: ["Bilal"], placeholder: "C'est Bilal ?" },
 	];
+
+	const allUsedNames = getAllNames().map((n) => n.toLowerCase());
+	const availableUsers = users.filter((user) =>
+		user.names.every((name) => !allUsedNames.includes(name.toLowerCase()))
+	);
 
 	function getAllNames() {
 		const raw = localStorage.getItem("allUserNames");
@@ -69,22 +104,9 @@ document.addEventListener("DOMContentLoaded", () => {
 		);
 	}
 
-	async function isNameTaken(name) {
-		const response = await fetch(`${BASE_URL}/is-name-taken`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ name }),
-		});
-
-		if (!response.ok) throw new Error("Erreur réseau");
-
-		const data = await response.json();
-		return data.isTaken;
-	}
-
 	btn.addEventListener("click", async () => {
 		input.classList.remove("invalid");
-		nameMessage.style.color = "#e74c3c";
+		nameMessage.style.color = "#e74c3c"; //
 		nameMessage.textContent = "";
 
 		const name = input.value.trim();
@@ -103,7 +125,6 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 
 		try {
-			// Vérifier si le nom est déjà pris
 			const responseIsTaken = await fetch(`${BASE_URL}/is-name-taken`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -124,7 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
 				return;
 			}
 
-			// Enregistrer le nom côté serveur via /register-user
 			const responseRegister = await fetch(`${BASE_URL}/register-user`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -138,7 +158,6 @@ document.addEventListener("DOMContentLoaded", () => {
 				);
 			}
 
-			// Tout est OK, on stocke le nom en localStorage
 			localStorage.setItem("userName", name);
 			saveName(name);
 			modal.classList.remove("active");
@@ -148,6 +167,8 @@ document.addEventListener("DOMContentLoaded", () => {
 			nameMessage.textContent = "Erreur serveur. Réessaie plus tard.";
 			input.classList.add("invalid");
 		}
+
+		input.focus();
 	});
 
 	input.addEventListener("keydown", (event) => {
@@ -186,11 +207,10 @@ document.addEventListener("DOMContentLoaded", () => {
 				alert(
 					"Impossible de supprimer les données serveur. Réessaie plus tard."
 				);
-				return; // On stoppe la suite si erreur serveur
+				return;
 			}
 		}
 
-		// Suppression locale après confirmation serveur
 		localStorage.removeItem("allUserNames");
 		localStorage.removeItem("userName");
 		localStorage.removeItem("selectedDates");
