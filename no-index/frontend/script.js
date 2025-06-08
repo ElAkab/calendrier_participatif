@@ -153,12 +153,13 @@ document.addEventListener("DOMContentLoaded", () => {
 				talkingWheel.classList.add("spin"); // start animation après la transition
 			}, 310); // un tout petit plus que 300ms pour être sûr
 		}, 0);
+
 		p.textContent = `Vérification`;
 		input.disabled = true;
 		btn.disabled = true;
-		input.disabled = true;
 
 		try {
+			// Vérifie si le prénom est déjà pris
 			const responseIsTaken = await fetch(`${BASE_URL}/is-name-taken`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -179,6 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				return;
 			}
 
+			// Enregistrement du prénom dans la BDD (Neon)
 			const responseRegister = await fetch(`${BASE_URL}/register-user`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -192,8 +194,11 @@ document.addEventListener("DOMContentLoaded", () => {
 				);
 			}
 
+			// Sauvegarde en local (localStorage + fonction perso si besoin)
 			localStorage.setItem("userName", name);
-			saveName(name);
+			saveName(name); // si cette fonction existe bien
+
+			// Fermeture de la modale + feedback
 			modal.classList.remove("active");
 			alert(`Bienvenue, ${name} ! 🎉`);
 			console.log(`On dirait bien que c'est, ${name} 😱 !`);
@@ -202,13 +207,11 @@ document.addEventListener("DOMContentLoaded", () => {
 			nameMessage.textContent = "Erreur serveur. Réessaie plus tard.";
 			input.classList.add("invalid");
 		} finally {
-			// On arrête l'animation et on réactive bouton + input
 			talkingWheel.classList.remove("spin");
 			btn.disabled = false;
 			input.disabled = false;
+			input.focus();
 		}
-
-		input.focus();
 	});
 
 	input.addEventListener("keydown", (event) => {
@@ -275,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 			const output = document.querySelector("#output");
 			if (output) output.textContent = "";
-		}, 50); // délai court pour laisser le temps au loader d'apparaître
+		}, 100); // délai court pour laisser le temps au loader d'apparaître
 
 		// Recharge la page après une courte pause (optionnel, laisse le temps au loader de s'afficher visuellement)
 		setTimeout(() => {
@@ -830,6 +833,7 @@ navs.forEach((nav) => {
 // Gestion du bouton de validation
 validateBtn?.addEventListener("click", () => {
 	if (isRedirecting) return;
+
 	// 🔄 Recharge les dates sélectionnées depuis localStorage
 	const stored = localStorage.getItem("selectedDates");
 	if (stored) selectedDates = JSON.parse(stored);
@@ -837,6 +841,14 @@ validateBtn?.addEventListener("click", () => {
 	// ✅ Vérifie les dates après mise à jour
 	if (selectedDates.length === 0) {
 		output.textContent = "Aucune date sélectionnée !";
+		return;
+	}
+
+	const userName = localStorage.getItem("userName");
+
+	if (!userName) {
+		output.textContent = "Erreur : prénom non enregistré.";
+		alert("Tu dois d'abord entrer ton prénom !");
 		return;
 	}
 
@@ -850,13 +862,11 @@ validateBtn?.addEventListener("click", () => {
 
 	output.textContent = selectedDates.length + " Dates sélectionnées : ";
 
-	const existingName = localStorage.getItem("userName") || "";
 	const dataToSend = {
-		userName: existingName,
+		userName: userName,
 		selectedDates: selectedDates,
 	};
 
-	const userName = localStorage.getItem("userName");
 	saveDatesForUser(userName, selectedDates);
 
 	fetch(`${BASE_URL}/submit-dates`, {
