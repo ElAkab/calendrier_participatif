@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
-	resetBtn.addEventListener("click", () => {
+	resetBtn.addEventListener("click", async () => {
 		if (
 			!confirm(
 				"Cette action supprimera toutes les données (prénom et dates), idéal pour recommencer 🤔.. \n\nT'es sûr ?"
@@ -169,18 +169,27 @@ document.addEventListener("DOMContentLoaded", () => {
 		const userName = localStorage.getItem("userName");
 
 		if (userName) {
-			fetch(`${BASE_URL}/delete-user/${encodeURIComponent(userName)}`, {
-				method: "DELETE",
-			})
-				.then((res) => {
-					if (!res.ok) throw new Error("Erreur serveur");
-					console.log(`Utilisateur ${userName} supprimé du serveur.`);
-				})
-				.catch((err) => {
-					console.error("Erreur lors de la suppression côté serveur :", err);
-				});
+			try {
+				const res = await fetch(
+					`${BASE_URL}/delete-user/${encodeURIComponent(userName)}`,
+					{
+						method: "DELETE",
+					}
+				);
+
+				if (!res.ok) throw new Error("Erreur serveur");
+
+				console.log(`Utilisateur ${userName} supprimé du serveur.`);
+			} catch (err) {
+				console.error("Erreur lors de la suppression côté serveur :", err);
+				alert(
+					"Impossible de supprimer les données serveur. Réessaie plus tard."
+				);
+				return; // On stoppe la suite si erreur serveur
+			}
 		}
 
+		// Suppression locale après confirmation serveur
 		localStorage.removeItem("allUserNames");
 		localStorage.removeItem("userName");
 		localStorage.removeItem("selectedDates");

@@ -213,20 +213,30 @@ app.delete("/clear", async (req, res) => {
 app.delete("/delete-user/:userName", async (req, res) => {
 	const userName = req.params.userName;
 
-	const index = participants.findIndex((p) => p.userName === userName);
+	if (!userName || typeof userName !== "string") {
+		return res.status(400).json({ message: "Nom d'utilisateur invalide." });
+	}
+
+	const index = participants.findIndex(
+		(p) => p.userName.toLowerCase() === userName.toLowerCase()
+	);
+
 	if (index === -1) {
 		return res.status(404).json({ message: "Utilisateur introuvable." });
 	}
 
 	participants.splice(index, 1);
+
 	Object.keys(votesByDate).forEach((date) => {
-		votesByDate[date] = votesByDate[date].filter((name) => name !== userName);
+		votesByDate[date] = votesByDate[date].filter(
+			(name) => name.toLowerCase() !== userName.toLowerCase()
+		);
 		if (votesByDate[date].length === 0) delete votesByDate[date];
 	});
 
-	// Supprimer en base PostgreSQL aussi
 	try {
 		await pool.query("DELETE FROM votes WHERE user_name = $1", [userName]);
+		console.log(`Utilisateur ${userName} supprimé côté base et mémoire.`);
 	} catch (error) {
 		console.error("Erreur suppression en base :", error);
 		return res.status(500).json({ message: "Erreur serveur" });
