@@ -107,7 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		showLoader();
 
 		try {
-			const res = await fetch(`${BASE_URL}/data`); // Remplace par ton endpoint
+			const res = await fetch(`${BASE_URL}/votes`); // Remplace par ton endpoint
 			if (!res.ok) throw new Error("Erreur serveur");
 
 			const data = await res.json();
