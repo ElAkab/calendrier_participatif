@@ -16,283 +16,114 @@ function safeParseJSON(raw) {
 
 document.addEventListener("DOMContentLoaded", () => {
 	const modal = document.getElementById("welcomeModal");
-	const talkingWheel = document.querySelector(".talking-wheel");
-	const p = document.querySelector("#welcomeModal p");
 	const input = document.getElementById("userNameInput");
 	const btn = document.getElementById("submitNameBtn");
-	const nameMessage = document.getElementById("nameMessage");
 	const resetBtn = document.getElementById("resetNamesBtn");
-	let lastPlaceholder = null;
+	const message = document.getElementById("nameMessage");
+	const loader = document.getElementById("loader");
 
-	function togglePageInteraction(disabled) {
+	if (!modal || !input || !btn || !resetBtn || !message) return;
+
+	const BASE_URL = "https://tonapi.example.com";
+
+	// Fonction pour activer/désactiver interaction page
+	function togglePage(disabled) {
 		document.body.style.pointerEvents = disabled ? "none" : "auto";
 		document.body.style.opacity = disabled ? "0.6" : "1";
+		if (loader) loader.style.display = disabled ? "block" : "none";
 	}
 
-	function showLoader(show) {
-		const loader = document.getElementById("loader");
-		if (loader) loader.style.display = show ? "block" : "none";
-	}
+	// Vérifie si utilisateur stocké en local
+	let storedName = localStorage.getItem("userName");
 
-	// Liste autorisée
-	const users = [
-		{ names: ["Ali"], placeholder: "C'est Ali ?" },
-		{ names: ["Hadja"], placeholder: "C'est Hadja ?" },
-		{ names: ["Mateusz"], placeholder: "C'est Mateusz ?" },
-		{ names: ["Nisrine"], placeholder: "C'est Nisrine ?" },
-		{ names: ["Anas"], placeholder: "C'est Anas ?" },
-		{ names: ["Winnie"], placeholder: "C'est Winnie ?" },
-		{
-			names: ["Adam", "Adam Lamarti", "Adam (L)", "Adam L", "Adam La"],
-			placeholder: "C'est Adam (L) ?",
-			maxVotes: 2,
-		},
-		{ names: ["Salma"], placeholder: "C'est Salma ?" },
-		{ names: ["Mohammed"], placeholder: "C'est Mohammed ?" },
-		{ names: ["Myriam"], placeholder: "C'est Myriam ?" },
-		{ names: ["Bilal"], placeholder: "C'est Bilal ?" },
-	];
-
-	const allUsedNames = getAllNames().map((n) => n.toLowerCase());
-	const availableUsers = users.filter((user) =>
-		user.names.every((name) => !allUsedNames.includes(name.toLowerCase()))
-	);
-
-	function getAllNames() {
-		const raw = localStorage.getItem("allUserNames");
-		return raw ? JSON.parse(raw) : [];
-	}
-
-	if (!modal || !input || !btn || !nameMessage || !resetBtn) return;
-
-	const userName = localStorage.getItem("userName");
-
-	// Étape 1 – Vérifier si l'utilisateur existe toujours côté serveur
-	if (userName) {
-		fetch(`${BASE_URL}/is-name-taken`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({ name: userName }),
-		})
-			.then((res) => res.json())
-			.then((data) => {
-				if (!data.isTaken) {
-					console.warn(
-						`👻 L'utilisateur ${userName} n'existe plus côté serveur. Réinitialisation.`
-					);
-					localStorage.removeItem("userName");
-					localStorage.removeItem("selectedDates");
-					localStorage.removeItem("allUserNames");
-					localStorage.removeItem("calendarMonth");
-					localStorage.removeItem("calendarYear");
-					location.reload();
-				}
-			})
-			.catch((err) => {
-				console.error("Erreur lors de la vérification du nom :", err);
+	async function checkUserOnServer(name) {
+		try {
+			const res = await fetch(`${BASE_URL}/is-name-taken`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ name }),
 			});
-	}
-
-	// Étape 2 – Modal : affichage ou non selon présence du nom
-	if (userName) {
-		modal.classList.remove("active");
-		console.log(`Prénom déjà stocké : ${userName}`);
-	} else {
-		modal.classList.add("active");
-		if (availableUsers.length > 0) {
-			let randomUser;
-			do {
-				randomUser =
-					availableUsers[Math.floor(Math.random() * availableUsers.length)];
-			} while (
-				availableUsers.length > 1 &&
-				randomUser.placeholder === lastPlaceholder
-			);
-
-			input.placeholder = randomUser.placeholder;
-			lastPlaceholder = randomUser.placeholder;
-		} else {
-			input.placeholder = "C'est toi ?";
-			lastPlaceholder = "C'est toi ?";
+			if (!res.ok) throw new Error("Erreur réseau");
+			const data = await res.json();
+			return data.isTaken;
+		} catch (err) {
+			console.error("Erreur serveur:", err);
+			return false;
 		}
 	}
 
-	function saveName(name) {
-		const allNames = getAllNames();
-		allNames.push(name);
-		localStorage.setItem("allUserNames", JSON.stringify(allNames));
+	async function init() {
+		if (storedName) {
+			togglePage(true);
+			const exists = await checkUserOnServer(storedName);
+			togglePage(false);
+			if (!exists) {
+				localStorage.removeItem("userName");
+				storedName = null;
+			}
+		}
+
+		if (storedName) {
+			modal.classList.remove("active");
+			message.textContent = `Bienvenue ${storedName} !`;
+		} else {
+			modal.classList.add("active");
+		}
 	}
 
-	function isAllowedName(inputName) {
-		const lower = inputName.trim().toLowerCase();
-		return users.some((user) =>
-			user.names.some((n) => n.toLowerCase() === lower)
-		);
-	}
+	init();
 
 	btn.addEventListener("click", async () => {
-		input.classList.remove("invalid");
-		nameMessage.style.color = "#e74c3c";
-		nameMessage.textContent = "";
-
 		const name = input.value.trim();
-
-		if (name.length === 0) {
-			nameMessage.textContent = "Merci de saisir un prénom.";
-			input.classList.add("invalid");
+		if (!name) {
+			message.textContent = "Veuillez saisir un prénom.";
 			return;
 		}
 
-		if (!isAllowedName(name)) {
-			nameMessage.textContent = "Ce prénom n'est pas reconnu.";
-			input.classList.add("invalid");
-			alert("Connais pas...");
+		togglePage(true);
+		message.textContent = "Vérification...";
+
+		const isTaken = await checkUserOnServer(name);
+		if (isTaken) {
+			message.textContent = "Ce prénom est déjà utilisé.";
+			togglePage(false);
 			return;
 		}
 
-		// Ajout animation + désactivation
-		setTimeout(() => {
-			talkingWheel.style.opacity = "1"; // ça déclenche la transition CSS
-			setTimeout(() => {
-				talkingWheel.classList.add("spin"); // start animation après la transition
-			}, 310); // un tout petit plus que 300ms pour être sûr
-		}, 0);
-
-		p.textContent = `Vérification`;
-		input.disabled = true;
-		btn.disabled = true;
-
+		// Enregistrer user côté serveur
 		try {
-			// Vérifie si le prénom est déjà pris
-			const responseIsTaken = await fetch(`${BASE_URL}/is-name-taken`, {
+			const res = await fetch(`${BASE_URL}/register-user`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ name }),
 			});
+			if (!res.ok) throw new Error("Erreur enregistrement");
 
-			if (!responseIsTaken.ok) throw new Error("Erreur réseau");
-
-			const dataIsTaken = await responseIsTaken.json();
-
-			if (dataIsTaken.isTaken) {
-				alert("Ce prénom a déjà été utilisé.");
-				p.textContent = `Entre ton prénom`;
-				nameMessage.textContent = "Ce prénom a déjà été utilisé.";
-				input.classList.add("invalid");
-				return;
-			}
-
-			// Enregistrement du prénom dans la BDD (Neon)
-			const responseRegister = await fetch(`${BASE_URL}/register-user`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ name }),
-			});
-
-			if (!responseRegister.ok) {
-				const errorData = await responseRegister.json();
-				throw new Error(
-					errorData.error || "Erreur serveur lors de l'enregistrement"
-				);
-			}
-
-			// Sauvegarde en local (localStorage + fonction perso si besoin)
 			localStorage.setItem("userName", name);
-			saveName(name); // si cette fonction existe bien
-
-			// Fermeture de la modale + feedback
+			message.textContent = `Bienvenue, ${name} !`;
 			modal.classList.remove("active");
-			alert(`Bienvenue, ${name} ! 🎉`);
-			console.log(`On dirait bien que c'est, ${name} 😱 !`);
 		} catch (err) {
-			console.error("Erreur lors du traitement du prénom :", err);
-			nameMessage.textContent = "Erreur serveur. Réessaie plus tard.";
-			input.classList.add("invalid");
+			message.textContent = "Erreur serveur, réessayez plus tard.";
+			console.error(err);
 		} finally {
-			talkingWheel.classList.remove("spin");
-			btn.disabled = false;
-			input.disabled = false;
-			input.focus();
+			togglePage(false);
 		}
 	});
 
-	input.addEventListener("keydown", (event) => {
-		if (event.key === "Enter") {
-			event.preventDefault();
-			btn.click();
-		}
-	});
-
-	resetBtn.addEventListener("click", async () => {
-		if (
-			!confirm(
-				"Cette action supprimera toutes les données (prénom et dates), idéal pour recommencer 🤔.. \n\nT'es sûr ?"
-			)
-		) {
-			return;
-		}
-
-		togglePageInteraction(true);
-		showLoader(true);
-
-		const userName = localStorage.getItem("userName");
-
-		if (userName) {
-			try {
-				console.log("Tentative suppression de :", userName);
-				const res = await fetch(
-					`${BASE_URL}/delete-user/${encodeURIComponent(userName)}`,
-					{
-						method: "DELETE",
-					}
-				);
-
-				if (!res.ok) throw new Error("Erreur serveur");
-
-				console.log(`Utilisateur ${userName} supprimé du serveur.`);
-			} catch (err) {
-				console.error("Erreur lors de la suppression côté serveur :", err);
-				alert(
-					"Impossible de supprimer les données serveur. Réessaie plus tard."
-				);
-
-				togglePageInteraction(false);
-				showLoader(false);
-				return;
-			}
-		}
-
-		localStorage.removeItem("allUserNames");
-		localStorage.removeItem("userName");
-		localStorage.removeItem("selectedDates");
-		localStorage.removeItem("calendarMonth");
-		localStorage.removeItem("calendarYear");
-
-		// Affiche le loader un court instant avant de faire quoi que ce soit
-		setTimeout(() => {
-			modal.classList.add("active");
-			input.value = "";
-			input.classList.remove("invalid");
-			nameMessage.textContent = "";
-
-			const allSelected = document.querySelectorAll(".selected");
-			allSelected.forEach((el) => el.classList.remove("selected"));
-
-			const output = document.querySelector("#output");
-			if (output) output.textContent = "";
-		}, 100); // délai court pour laisser le temps au loader d'apparaître
-
-		// Recharge la page après une courte pause (optionnel, laisse le temps au loader de s'afficher visuellement)
-		setTimeout(() => {
+	resetBtn.addEventListener("click", () => {
+		if (confirm("Supprimer vos données et recommencer ?")) {
+			localStorage.removeItem("userName");
 			location.reload();
-		}, 10);
+		}
+	});
+
+	input.addEventListener("keydown", (e) => {
+		if (e.key === "Enter") btn.click();
 	});
 });
 
-const nameInput = document.getElementById("name");
-const saveNameBtn = document.getElementById("saveName");
+const nameInput = document.getElementById("userNameInput");
+const saveNameBtn = document.getElementById("submitNameBtn");
 
 // Si les éléments existent, on ajoute l'écouteur d'événement
 if (nameInput && saveNameBtn) {
@@ -301,6 +132,7 @@ if (nameInput && saveNameBtn) {
 	saveNameBtn.addEventListener("click", () => {
 		const rawName = nameInput.value;
 		const cleanName = sanitizeName(rawName);
+		console.log("rawName:", rawName, "| cleanName:", cleanName);
 
 		if (!cleanName) {
 			alert("Veuillez entrer un prénom valide.");
@@ -313,13 +145,17 @@ if (nameInput && saveNameBtn) {
 		}
 
 		const existingName = localStorage.getItem("userName");
+		console.log("existingName in localStorage:", existingName);
+
 		if (existingName && typeof existingName !== "string") {
 			console.warn("Nom corrompu détecté dans le localStorage.");
 			localStorage.removeItem("userName");
 		}
 
+		modal.classList.remove("active");
+
 		localStorage.setItem("userName", cleanName);
-		window.location.href = "calendrier.html";
+		console.log("Nom sauvegardé :", cleanName);
 	});
 }
 
