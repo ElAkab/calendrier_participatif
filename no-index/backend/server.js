@@ -19,7 +19,25 @@ const PORT = process.env.PORT || 3000;
 const participants = [];
 const votesByDate = {}; // stocke les noms par date
 
-app.use(cors());
+const allowedOrigins = [
+	"https://calendrier-participatif-backend.onrender.com",
+	"https://jour-j-calendry.netlify.app",
+	"http://localhost:3000",
+];
+
+const corsOptions = {
+	origin: function (origin, callback) {
+		if (!origin || allowedOrigins.includes(origin)) {
+			callback(null, true);
+		} else {
+			callback(new Error("Not allowed by CORS"));
+		}
+	},
+	methods: ["GET", "POST", "DELETE"],
+	credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Sert les fichiers statiques (ex : HTML/CSS/JS frontend)
