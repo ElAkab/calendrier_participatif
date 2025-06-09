@@ -134,7 +134,7 @@
 
 			function resetVotes() {
 				if (confirm("⚠️ Es-tu sûr de vouloir supprimer tous les votes ?")) {
-					fetch("https://calendrier-participatif.onrender.com/clear", {
+					fetch(`${BASE_URL}/clear`, {
 						method: "DELETE",
 					})
 						.then((res) => {

@@ -1,10 +1,9 @@
 console.log("JS chargé");
 
-const BASE_URL = window.location.hostname.includes("test-modifs") // ou une autre partie de l’URL Netlify de test
-	? "https://calendrier-participatif-backend-test.onrender.com"
-	: window.location.hostname === "localhost"
+const BASE_URL = window.location.hostname.includes("test-modifs"); // ou une autre partie de l’URL Netlify de test
+window.location.hostname === "localhost"
 	? "http://localhost:3000"
-	: "https://calendrier-participatif-backend.onrender.com";
+	: "https://calendrier-participatif-public.onrender.com";
 
 function safeParseJSON(raw) {
 	try {
@@ -23,8 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	const loader = document.getElementById("loader");
 
 	if (!modal || !input || !btn || !resetBtn || !message) return;
-
-	const BASE_URL = "https://tonapi.example.com";
 
 	// Fonction pour activer/désactiver interaction page
 	function togglePage(disabled) {
@@ -73,17 +70,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	init();
 
+	input.maxLength = 20;
+
+	input.addEventListener("keydown", (e) => {
+		if (e.key === "Enter") btn.click();
+	});
+
 	btn.addEventListener("click", async () => {
-		const name = input.value.trim();
-		if (!name) {
-			message.textContent = "Veuillez saisir un prénom.";
+		const rawName = input.value.trim();
+		const cleanName = sanitizeName(rawName);
+		console.log("rawName:", rawName, "| cleanName:", cleanName);
+
+		if (!cleanName) {
+			message.textContent = "Veuillez entrer un prénom valide.";
 			return;
+		}
+
+		if (cleanName.length < 2) {
+			message.textContent = "Le prénom doit faire au moins 2 caractères.";
+			return;
+		}
+
+		const existingName = localStorage.getItem("userName");
+		console.log("existingName in localStorage:", existingName);
+
+		if (existingName && typeof existingName !== "string") {
+			console.warn("Nom corrompu détecté dans le localStorage.");
+			localStorage.removeItem("userName");
 		}
 
 		togglePage(true);
 		message.textContent = "Vérification...";
 
-		const isTaken = await checkUserOnServer(name);
+		const isTaken = await checkUserOnServer(cleanName);
 		if (isTaken) {
 			message.textContent = "Ce prénom est déjà utilisé.";
 			togglePage(false);
@@ -95,13 +114,14 @@ document.addEventListener("DOMContentLoaded", () => {
 			const res = await fetch(`${BASE_URL}/register-user`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ name }),
+				body: JSON.stringify({ name: cleanName }),
 			});
 			if (!res.ok) throw new Error("Erreur enregistrement");
 
-			localStorage.setItem("userName", name);
-			message.textContent = `Bienvenue, ${name} !`;
+			localStorage.setItem("userName", cleanName);
+			message.textContent = `Bienvenue, ${cleanName} !`;
 			modal.classList.remove("active");
+			console.log("Nom sauvegardé :", cleanName);
 		} catch (err) {
 			message.textContent = "Erreur serveur, réessayez plus tard.";
 			console.error(err);
@@ -116,48 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			location.reload();
 		}
 	});
-
-	input.addEventListener("keydown", (e) => {
-		if (e.key === "Enter") btn.click();
-	});
 });
-
-const nameInput = document.getElementById("userNameInput");
-const saveNameBtn = document.getElementById("submitNameBtn");
-
-// Si les éléments existent, on ajoute l'écouteur d'événement
-if (nameInput && saveNameBtn) {
-	nameInput.maxLength = 20;
-
-	saveNameBtn.addEventListener("click", () => {
-		const rawName = nameInput.value;
-		const cleanName = sanitizeName(rawName);
-		console.log("rawName:", rawName, "| cleanName:", cleanName);
-
-		if (!cleanName) {
-			alert("Veuillez entrer un prénom valide.");
-			return;
-		}
-
-		if (cleanName.length < 2) {
-			alert("Le prénom doit faire au moins 2 caractères.");
-			return;
-		}
-
-		const existingName = localStorage.getItem("userName");
-		console.log("existingName in localStorage:", existingName);
-
-		if (existingName && typeof existingName !== "string") {
-			console.warn("Nom corrompu détecté dans le localStorage.");
-			localStorage.removeItem("userName");
-		}
-
-		modal.classList.remove("active");
-
-		localStorage.setItem("userName", cleanName);
-		console.log("Nom sauvegardé :", cleanName);
-	});
-}
 
 // Fonction pour nettoyer et formater le nom
 function sanitizeName(name) {

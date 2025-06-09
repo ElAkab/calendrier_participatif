@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const BASE_URL =
 		window.location.hostname === "localhost"
 			? "http://localhost:3000"
-			: "https://your-backend-url.com"; // Remplace par ton API
+			: "https://calendrier-participatif-public.onrender.com"; // Remplace par ton API
 
 	// Exemple de plages avec leurs couleurs
 	const DATE_RANGES = {
