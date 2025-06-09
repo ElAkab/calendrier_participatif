@@ -395,7 +395,7 @@ const VACANCES_2025 = [
 	},
 	{
 		nom: "Vacances d'été",
-		debut: "2025-07-04",
+		debut: "2025-07-05",
 		fin: "2025-08-24",
 	},
 ];
