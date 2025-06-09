@@ -409,7 +409,7 @@ const VACANCES_2026 = [
 	{
 		nom: "Vacances de Carnaval",
 		debut: "2026-02-16",
-		fin: "2026-03-01",
+		fin: "2026-02-27",
 	},
 	{
 		nom: "Vacances de printemps (Pâques)",
