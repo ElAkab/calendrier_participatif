@@ -21,7 +21,7 @@ const votesByDate = {}; // stocke les noms par date
 
 const allowedOrigins = [
 	"https://calendrier-participatif-backend.onrender.com",
-	"https://jour-j-calendry.netlify.app",
+	"https://jour-j-calendry-3000.netlify.app",
 	"http://localhost:3000",
 ];
 
