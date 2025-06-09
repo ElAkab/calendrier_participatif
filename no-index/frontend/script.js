@@ -380,7 +380,7 @@ const months = [
 const VACANCES_2025 = [
 	{
 		nom: "Vacances d'hiver (Noël)",
-		debut: "2024-12-22",
+		debut: "2024-12-21",
 		fin: "2025-01-04",
 	},
 	{
@@ -403,22 +403,22 @@ const VACANCES_2025 = [
 const VACANCES_2026 = [
 	{
 		nom: "Vacances d'hiver (Noël)",
-		debut: "2025-12-22",
-		fin: "2026-01-02",
+		debut: "2025-12-27",
+		fin: "2026-01-01",
 	},
 	{
 		nom: "Vacances de Carnaval",
-		debut: "2026-02-13",
+		debut: "2026-02-16",
 		fin: "2026-03-01",
 	},
 	{
 		nom: "Vacances de printemps (Pâques)",
-		debut: "2026-04-24",
+		debut: "2026-04-25",
 		fin: "2026-05-10",
 	},
 	{
 		nom: "Vacances d'été",
-		debut: "2026-07-03",
+		debut: "2026-07-04",
 		fin: "2026-08-24",
 	},
 ];
@@ -431,17 +431,17 @@ const VACANCES_2027 = [
 	},
 	{
 		nom: "Vacances de Carnaval",
-		debut: "2027-02-14",
+		debut: "2027-02-15",
 		fin: "2027-02-21",
 	},
 	{
 		nom: "Vacances de printemps (Pâques)",
-		debut: "2027-04-04",
+		debut: "2027-04-03",
 		fin: "2027-04-18",
 	},
 	{
 		nom: "Vacances d'été",
-		debut: "2027-07-01",
+		debut: "2027-07-03",
 		fin: "2027-08-29",
 	},
 ];
@@ -454,17 +454,17 @@ const VACANCES_2028 = [
 	},
 	{
 		nom: "Vacances de Carnaval",
-		debut: "2028-02-25",
+		debut: "2028-02-26",
 		fin: "2028-03-05",
 	},
 	{
 		nom: "Vacances de printemps (Pâques)",
-		debut: "2028-03-24",
+		debut: "2028-03-25",
 		fin: "2028-04-09",
 	},
 	{
 		nom: "Vacances d'été",
-		debut: "2028-07-",
+		debut: "2028-07-01",
 		fin: "2028-08-28",
 	},
 ];
@@ -546,11 +546,16 @@ function getVacanceForDate(date) {
 		...VACANCES_2027,
 		...VACANCES_2028,
 	];
-	for (const vac of allVacances) {
-		const start = new Date(vac.debut);
-		const end = new Date(vac.fin);
-		if (date >= start && date <= end) {
-			return vac; // Retourne l’objet vacance
+
+	for (const vacance of allVacances) {
+		const debut = new Date(vacance.debut);
+		const fin = new Date(vacance.fin);
+
+		debut.setHours(0, 0, 0, 0);
+		fin.setHours(0, 0, 0, 0);
+
+		if (date >= debut && date <= fin) {
+			return vacance;
 		}
 	}
 	return null;
@@ -608,15 +613,10 @@ function updateHolidayName() {
 	allVacances.forEach((vacance) => {
 		const start = new Date(vacance.debut);
 		const end = new Date(vacance.fin);
+		const monthStart = new Date(year, month, 1);
+		const monthEnd = new Date(year, month + 1, 0);
 
-		if (
-			(year === start.getFullYear() && month === start.getMonth()) ||
-			(year === end.getFullYear() && month === end.getMonth()) ||
-			(year > start.getFullYear() && year < end.getFullYear()) ||
-			(year === start.getFullYear() &&
-				month > start.getMonth() &&
-				(year < end.getFullYear() || month <= end.getMonth()))
-		) {
+		if (monthEnd >= start && monthStart <= end) {
 			matchingHolidays.push(vacance.nom);
 		}
 	});
@@ -656,12 +656,12 @@ function updateHolidayName() {
 	updateVacancesStyle(color);
 }
 
-function isDateInVacation(date) {
-	for (const vac of VACANCES) {
+function isDateInVacation(date, vacances) {
+	for (const vac of vacances) {
 		const debut = new Date(vac.debut);
 		const fin = new Date(vac.fin);
 
-		// Normalisation (heure à 0h)
+		// Normalisation
 		debut.setHours(0, 0, 0, 0);
 		fin.setHours(0, 0, 0, 0);
 

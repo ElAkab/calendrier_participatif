@@ -18,6 +18,7 @@ body {
 }
 
 h1 {
+	padding: 90px 0 0 0; /* espace en haut et en bas */
 	color: rgba(255, 255, 255, 0.9);
 	font-style: italic;
 	font-weight: 700;
@@ -172,3 +173,52 @@ li span {
 #result-list {
 	margin-bottom: 8px;
 }
+
+.vacances-legend {
+	position: fixed; /* fixe la légende */
+	top: 0; /* en haut de la page */
+	left: 0;
+	right: 0; /* pour prendre toute la largeur */
+	width: 100vw;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 0.8rem;
+	margin: 0;
+	padding: 10px 15px;
+	background: rgba(255, 255, 255, 0.25);
+	border-radius: 12px;
+	backdrop-filter: blur(4px);
+	border: 1px solid rgba(255, 255, 255, 0.3);
+	z-index: 9999;
+
+	overflow-x: auto;
+	scrollbar-width: thin;
+}
+
+.vacances-legend-item {
+	display: flex;
+	align-items: center;
+	font-size: 0.8rem;
+	color: white;
+	border-right: 2px solid rgba(255, 255, 255, 0.3);
+	border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+	padding: 8px;
+}
+
+@media (min-width: 600px) and (max-width: 1024px) {
+	.vacances-legend-item {
+		font-size: 1rem; /* Taille un peu plus grande sur tablette */
+	}
+}
+
+.vacances-legend-circle {
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	margin-right: 8px;
+	border: 1px solid rgba(0, 0, 0, 0.5);
+	box-shadow: inset 2px 2px 3px rgba(255, 255, 255, 0.6),
+		inset -2px -2px 3px rgba(0, 0, 0, 0.6);
+}
+
+/* Tu peux supprimer la media query si tu ne veux plus d’adaptation */

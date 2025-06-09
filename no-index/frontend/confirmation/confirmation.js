@@ -1,10 +1,14 @@
 const datesList = document.getElementById("datesList");
+// Placer le nom de l'utilisateur dans le titre
+const userName = localStorage.getItem("userName");
+document.querySelector("h1").textContent = "Nickel " + userName + " !";
+
 const savedDates = JSON.parse(localStorage.getItem("selectedDates")) || [];
 const VACANCES = {
 	"Vacances d'hiver (Noël)": [
 		["2024-12-24", "2025-01-05"],
-		["2025-12-22", "2026-01-02"],
-		["2026-12-27", "2027-01-03"],
+		["2025-12-22", "2026-01-04"],
+		["2026-12-21", "2027-01-01"],
 		["2027-12-25", "2028-01-02"],
 	],
 	"Vacances de Carnaval": [
@@ -22,7 +26,7 @@ const VACANCES = {
 	"Vacances d'été": [
 		["2025-07-05", "2025-08-24"],
 		["2026-07-04", "2026-08-24"],
-		["2027-07-01", "2027-08-29"],
+		["2027-07-03", "2027-08-29"],
 		["2028-07-01", "2028-08-28"],
 	],
 };
@@ -61,15 +65,12 @@ if (savedDates.length === 0) {
 }
 
 function getVacationColorForDate(dateString) {
-	const current = normalizeDate(new Date(dateString));
+	const current = normalizeDate(new Date(dateString)).getTime(); // timestamp
 	for (const [name, ranges] of Object.entries(VACANCES)) {
 		for (const [start, end] of ranges) {
-			const from = normalizeDate(new Date(start));
-			const to = normalizeDate(new Date(end));
-			// Log pour debug
-			console.log(`${dateString} - checking ${name}: ${start} to ${end}`);
+			const from = normalizeDate(new Date(start)).getTime();
+			const to = normalizeDate(new Date(end)).getTime();
 			if (current >= from && current <= to) {
-				console.log(`Match found: ${dateString} is in ${name}`);
 				return VACANCES_COLORS[name];
 			}
 		}

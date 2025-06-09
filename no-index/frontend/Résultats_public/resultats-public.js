@@ -74,6 +74,50 @@ document.addEventListener("DOMContentLoaded", () => {
 		"Vacances d'été": "#FFA500", // Orange
 	};
 
+	function createVacancesLegend() {
+		const legendContainer = document.getElementById("vacancesLegend");
+		if (!legendContainer) return; // sécurité si absent
+
+		legendContainer.innerHTML = ""; // Vide le contenu
+
+		for (const [vacName, color] of Object.entries(VACANCES_COLORS)) {
+			const legendItem = document.createElement("div");
+			legendItem.classList.add("vacances-legend-item");
+
+			// Appliquer la couleur de texte à cet item
+			legendItem.style.color = color;
+
+			const colorBox = document.createElement("span");
+			colorBox.classList.add("vacances-legend-circle");
+			colorBox.style.backgroundColor = color; // couleur dynamique
+
+			const label = document.createElement("span");
+			label.textContent = vacName;
+
+			legendItem.appendChild(colorBox);
+			legendItem.appendChild(label);
+			legendContainer.appendChild(legendItem);
+		}
+	}
+
+	function updateGridColumns() {
+		const legend = document.querySelector(".vacances-legend");
+		if (!legend) return;
+
+		// Récupérer le nombre réel de colonnes dans la grille CSS
+		const computedStyle = getComputedStyle(legend);
+		const columns = computedStyle
+			.getPropertyValue("grid-template-columns")
+			.split(" ").length;
+
+		// On met ce nombre dans une variable CSS
+		legend.style.setProperty("--columns-count", columns);
+	}
+
+	// Appelle cette fonction au chargement et au resize
+	window.addEventListener("load", updateGridColumns);
+	window.addEventListener("resize", updateGridColumns);
+
 	function showMessage(text, duration = 3000) {
 		messageContainer.textContent = text;
 		messageContainer.classList.add("show");
@@ -142,8 +186,20 @@ document.addEventListener("DOMContentLoaded", () => {
 				resultList.style.listStyle = "none";
 				resultList.innerHTML =
 					"<li style='text-align:center;'>Y a rien ici... comme dans mon estomac d'ailleurs...<br>À toi de remplir !<br><small><em>(Pas mon estomac, mais après si tu veux m'offrir à manger, sache que j'aime ...)</em></small></li>";
+
+				// On vide aussi la légende si les participants sont absents
+				const legendDiv = document.querySelector(".vacances-legend");
+				if (legendDiv) {
+					legendDiv.innerHTML = "";
+				}
+
 				showMessage("Il manque absolument tout le monde 😪");
 				return;
+			}
+
+			const legendDiv = document.querySelector(".vacances-legend");
+			if (legendDiv && legendDiv.innerHTML.trim() === "") {
+				createVacancesLegend();
 			}
 
 			// --- Traitement des votes manquants ---
@@ -158,7 +214,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			const votesMissing = totalVotesExpected - uniqueVotedNames.length;
 
 			// --- Affichage du message ---
-			messageContainer.innerHTML = "";
+			messageContainer.innerHTML = ""; // On vide avant d'afficher un nouveau message
 
 			if (votesMissing > 0) {
 				const message = document.createElement("p");
