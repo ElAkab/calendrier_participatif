@@ -147,14 +147,38 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	let isFirstLoad = true;
+	let loaderInterval = null;
 
-	function showLoader(message = "Patiente un petit peu, je cherche…") {
+	function showLoader(message = "Chargement en cours") {
+		const baseMessage = message;
+		let dotCount = 0;
+
 		loader.style.display = "block";
-		loader.textContent = message;
+
+		// Nettoyer un éventuel ancien intervalle
+		if (loaderInterval) {
+			clearInterval(loaderInterval);
+		}
+
+		// Démarrer l'animation des points
+		loaderInterval = setInterval(() => {
+			dotCount = (dotCount + 1) % 4; // 0, 1, 2, 3 => repart à 0
+			let dots = ".".repeat(dotCount);
+			loader.textContent = baseMessage + dots;
+		}, 1000);
 	}
 
 	function hideLoader() {
 		loader.style.display = "none";
+
+		// Arrêter l'animation
+		if (loaderInterval) {
+			clearInterval(loaderInterval);
+			loaderInterval = null;
+		}
+
+		// Optionnel : remettre le message de base
+		loader.textContent = "";
 	}
 
 	async function loadVotesAndRender() {
@@ -163,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		try {
 			// Afficher le loader immédiatement pour le premier chargement
 			if (isFirstLoad) {
-				showLoader("Chargement des résultats...");
+				showLoader();
 			} else {
 				// Pour les chargements suivants : afficher le loader après 1 seconde seulement si c’est long
 				loaderTimeout = setTimeout(() => {
@@ -185,7 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			if (!participants || participants.length === 0) {
 				resultList.style.listStyle = "none";
 				resultList.innerHTML =
-					"<li style='text-align:center;'>Y a rien ici... comme dans mon estomac d'ailleurs...<br>À toi de remplir !<br><small><em>(Pas mon estomac, mais après si tu veux m'offrir à manger, sache que j'aime ...)</em></small></li>";
+					"<li style='text-align:center;'>Y a rien ici... comme dans mon estomac d'ailleurs...<br>À toi de remplir !<br><small class='nowrap-ellipsis'><em>(Pas mon estomac, mais après si t'insiste je dis pas non.)</em></small></li>";
 
 				// On vide aussi la légende si les participants sont absents
 				const legendDiv = document.querySelector(".vacances-legend");
