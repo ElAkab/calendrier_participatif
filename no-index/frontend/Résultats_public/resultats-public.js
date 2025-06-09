@@ -102,13 +102,42 @@ document.addEventListener("DOMContentLoaded", () => {
 		return null; // Pas de vacances pour cette date
 	}
 
+	let isFirstLoad = true;
+
+	function showLoader(message = "Patiente un petit peu, je cherche…") {
+		loader.style.display = "block";
+		loader.textContent = message;
+	}
+
+	function hideLoader() {
+		loader.style.display = "none";
+	}
+
 	async function loadVotesAndRender() {
+		let loaderTimeout;
+
 		try {
+			// Afficher le loader immédiatement pour le premier chargement
+			if (isFirstLoad) {
+				showLoader("Chargement des résultats...");
+			} else {
+				// Pour les chargements suivants : afficher le loader après 1 seconde seulement si c’est long
+				loaderTimeout = setTimeout(() => {
+					showLoader("Mise à jour des résultats...");
+				}, 1000);
+			}
+
 			const res = await fetch(`${BASE_URL}/votes`);
 			if (!res.ok) throw new Error("Erreur serveur");
 			const participants = await res.json();
 
-			// Message si aucun participant
+			// Cache le loader immédiatement si la réponse est rapide
+			clearTimeout(loaderTimeout);
+			hideLoader();
+
+			isFirstLoad = false; // On n’est plus sur le premier chargement
+
+			// --- Affichage ou message s’il n’y a pas de participants ---
 			if (!participants || participants.length === 0) {
 				resultList.style.listStyle = "none";
 				resultList.innerHTML =
@@ -117,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				return;
 			}
 
-			// --- Traitement : vote manquant ---
+			// --- Traitement des votes manquants ---
 			const votedNames = participants.map((p) =>
 				p.userName.trim().toLowerCase()
 			);
@@ -206,14 +235,20 @@ document.addEventListener("DOMContentLoaded", () => {
 			resultList.appendChild(container);
 		} catch (err) {
 			console.error("Erreur lors du chargement des votes :", err);
+			clearTimeout(loaderTimeout);
+			hideLoader();
 			showMessage(
 				"Erreur de chargement des résultats, je répare ça le plus vite possible !"
 			);
+		} finally {
+			clearTimeout(loaderTimeout);
+			hideLoader();
 		}
 	}
 
-	// Chargement immédiat
+	// Chargement initial
 	loadVotesAndRender();
 
+	// Rafraîchissement toutes les 5 secondes
 	setInterval(loadVotesAndRender, 5000);
 });

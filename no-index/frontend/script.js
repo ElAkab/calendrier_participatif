@@ -177,11 +177,9 @@ document.addEventListener("DOMContentLoaded", () => {
 			const dataIsTaken = await responseIsTaken.json();
 
 			if (dataIsTaken.isTaken) {
-				alert(
-					"Ce prénom a déjà été utilisé. Merci de ne pas voter plusieurs fois."
-				);
-				nameMessage.textContent =
-					"Ce prénom a déjà été utilisé. Merci de ne pas voter plusieurs fois.";
+				alert("Ce prénom a déjà été utilisé.");
+				p.textContent = `Entre ton prénom`;
+				nameMessage.textContent = "Ce prénom a déjà été utilisé.";
 				input.classList.add("invalid");
 				return;
 			}
