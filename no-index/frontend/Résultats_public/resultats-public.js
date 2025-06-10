@@ -134,9 +134,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const dateCount = {};
 		data.forEach((item) => {
-			item.dates.forEach((date) => {
-				dateCount[date] = (dateCount[date] || 0) + 1;
-			});
+			if (Array.isArray(item.dates)) {
+				item.dates.forEach((date) => {
+					dateCount[date] = (dateCount[date] || 0) + 1;
+				});
+			} else {
+				console.warn("item.dates n'est pas un tableau :", item);
+			}
 		});
 
 		const sortedDates = Object.entries(dateCount).sort((a, b) => b[1] - a[1]);
