@@ -43,7 +43,14 @@ document.addEventListener("DOMContentLoaded", () => {
 		{ names: ["Anas"], placeholder: "C'est Anas ?" },
 		{ names: ["Winnie"], placeholder: "C'est Winnie ?" },
 		{
-			names: ["Adam", "Adam Lamarti", "Adam (L)", "Adam L", "Adam La"],
+			names: [
+				"Adam E",
+				"Adam El",
+				"Adam L",
+				"Adam La",
+				"Adam Lamarti",
+				"Adam (L)",
+			],
 			placeholder: "C'est Adam (L) ?",
 			maxVotes: 2,
 		},
