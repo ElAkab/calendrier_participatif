@@ -134,12 +134,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const dateCount = {};
 		data.forEach((item) => {
-			if (Array.isArray(item.dates)) {
-				item.dates.forEach((date) => {
+			if (Array.isArray(item.selectedDates)) {
+				item.selectedDates.forEach((date) => {
 					dateCount[date] = (dateCount[date] || 0) + 1;
 				});
 			} else {
-				console.warn("item.dates n'est pas un tableau :", item);
+				console.warn("item.selectedDates n'est pas un tableau :", item);
 			}
 		});
 
