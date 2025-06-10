@@ -23,6 +23,7 @@ const allowedOrigins = [
 	"https://calendrier-participatif-backend.onrender.com",
 	"https://jour-j-calendry-3000.netlify.app",
 	"http://localhost:3000",
+	"http://127.0.0.1:5500", // Ajoute cette ligne
 ];
 
 const corsOptions = {
