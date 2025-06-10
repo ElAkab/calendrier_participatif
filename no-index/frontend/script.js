@@ -159,20 +159,25 @@ document.addEventListener("DOMContentLoaded", () => {
 			return;
 		}
 
-		// Ajout animation + désactivation
+		// Animation démarrage immédiate
 		setTimeout(() => {
-			talkingWheel.style.opacity = "1"; // ça déclenche la transition CSS
+			talkingWheel.style.opacity = "1";
 			setTimeout(() => {
-				talkingWheel.classList.add("spin"); // start animation après la transition
-			}, 310); // un tout petit plus que 300ms pour être sûr
+				talkingWheel.classList.add("spin");
+			}, 310);
 		}, 0);
 
 		p.textContent = `Vérification`;
+
+		// Met en place un timeout qui change le texte après 5 sec
+		const timeoutId = setTimeout(() => {
+			p.textContent = `Bientôt fini promis !`;
+		}, 5000);
+
 		input.disabled = true;
 		btn.disabled = true;
 
 		try {
-			// Vérifie si le prénom est déjà pris
 			const responseIsTaken = await fetch(`${BASE_URL}/is-name-taken`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -191,7 +196,6 @@ document.addEventListener("DOMContentLoaded", () => {
 				return;
 			}
 
-			// Enregistrement du prénom dans la BDD (Neon)
 			const responseRegister = await fetch(`${BASE_URL}/register-user`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -205,11 +209,9 @@ document.addEventListener("DOMContentLoaded", () => {
 				);
 			}
 
-			// Sauvegarde en local (localStorage + fonction perso si besoin)
 			localStorage.setItem("userName", name);
-			saveName(name); // si cette fonction existe bien
+			saveName(name);
 
-			// Fermeture de la modale + feedback
 			modal.classList.remove("active");
 			alert(`Bienvenue, ${name} ! 🎉`);
 			console.log(`On dirait bien que c'est, ${name} 😱 !`);
@@ -218,6 +220,9 @@ document.addEventListener("DOMContentLoaded", () => {
 			nameMessage.textContent = "Erreur serveur. Réessaie plus tard.";
 			input.classList.add("invalid");
 		} finally {
+			// On annule le timeout si la requête s'est terminée avant 5s
+			clearTimeout(timeoutId);
+
 			talkingWheel.classList.remove("spin");
 			btn.disabled = false;
 			input.disabled = false;
