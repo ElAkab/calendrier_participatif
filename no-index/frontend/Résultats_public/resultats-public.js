@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 			const legendDiv = document.querySelector(".vacances-legend");
 			if (legendDiv && legendDiv.innerHTML.trim() === "") {
-				createVacancesLegend();
+				createDateLegend();
 			}
 
 			// --- Traitement des votes manquants ---
