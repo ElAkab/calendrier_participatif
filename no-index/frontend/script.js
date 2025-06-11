@@ -169,9 +169,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		p.textContent = `Vérification`;
 
-		// Met en place un timeout qui change le texte après 5 sec
 		const timeoutId = setTimeout(() => {
 			p.textContent = `Bientôt fini promis !`;
+
+			setTimeout(() => {
+				p.textContent = `Wallah c'est vrai.`;
+			}, 4000);
 		}, 5000);
 
 		input.disabled = true;
