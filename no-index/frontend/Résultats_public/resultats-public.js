@@ -134,6 +134,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		if (dates) {
 			dates.remove();
 		}
+
+		// 👉 Créer une nouvelle div
 		const participantsContainer = document.createElement("div");
 		participantsContainer.classList.add("participants-container");
 
@@ -156,17 +158,25 @@ document.addEventListener("DOMContentLoaded", () => {
 			const li = document.createElement("li");
 			const color = getDateColor(date);
 
-			li.textContent = `${date} - ${count} vote(s)`;
+			// Formatage de la date
+			const dateObj = new Date(date);
+			const day = String(dateObj.getDate()).padStart(2, "0");
+			const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+			const year = dateObj.getFullYear();
+			const formattedDate = `${day}/${month}/${year}`;
+
+			li.textContent = `${formattedDate}`;
+
 			if (color) {
-				li.style.backgroundColor = color;
-				li.style.color = "#fff";
-				li.style.padding = "8px";
-				li.style.borderRadius = "5px";
-				li.style.marginBottom = "5px";
+				li.style.color = color;
 			}
-			li.classList.add;
-			resultList.appendChild(li);
+
+			li.classList.add("participant");
+			participantsContainer.appendChild(li);
 		});
+
+		// 👉 Ajouter la nouvelle div au DOM
+		resultList.appendChild(participantsContainer);
 	}
 
 	loadAndRenderData();

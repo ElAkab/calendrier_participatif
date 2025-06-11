@@ -59,6 +59,7 @@ h1 {
 	max-width: 320px;
 	min-width: 280px; /* évite que ça devienne trop étroit */
 	align-items: start;
+	list-style: none;
 	width: 100%;
 	box-sizing: border-box;
 }
