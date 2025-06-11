@@ -79,105 +79,208 @@ document.addEventListener("DOMContentLoaded", () => {
 		}, duration);
 	}
 
+	let isFirstLoad = true;
 	let loaderInterval = null;
+	let loaderTimeout = null;
 
-	function showLoader(message = "Chargement...") {
+	function showLoader(message = "Chargement en cours") {
+		let baseMessage = message;
 		let dotCount = 0;
+
 		loader.style.display = "block";
 
-		if (loaderInterval) clearInterval(loaderInterval);
+		// Nettoyer un éventuel ancien intervalle
+		if (loaderInterval) {
+			clearInterval(loaderInterval);
+		}
 
+		// Nettoyer un éventuel ancien timeout
+		if (loaderTimeout) {
+			clearTimeout(loaderTimeout);
+		}
+
+		// Démarrer l'animation des points
 		loaderInterval = setInterval(() => {
-			dotCount = (dotCount + 1) % 4;
+			dotCount = (dotCount + 1) % 4; // 0, 1, 2, 3 => repart à 0
 			let dots = ".".repeat(dotCount);
-			loader.textContent = message + dots;
-		}, 500);
+			loader.textContent = baseMessage + dots;
+		}, 1000);
+
+		// Après 5 secondes, afficher le message additionnel
+		loaderTimeout = setTimeout(() => {
+			// On ajoute un message sous le loader (par exemple dans un élément dédié)
+			let extraMessage = document.createElement("div");
+			extraMessage.textContent = "C'est toujours comme ça la première fois";
+			loader.parentNode.appendChild(extraMessage);
+		}, 5000);
+	}
+
+	function clearTimer(timer) {
+		if (timer) {
+			clearInterval(timer);
+			clearTimeout(timer);
+		}
+		return null; // Toujours remettre la référence à null
 	}
 
 	function hideLoader() {
+		// Cacher le loader
 		loader.style.display = "none";
-		if (loaderInterval) {
-			clearInterval(loaderInterval);
-			loaderInterval = null;
-		}
+
+		// Arrêter l'animation et le délai
+		loaderInterval = clearTimer(loaderInterval);
+		loaderTimeout = clearTimer(loaderTimeout);
+
+		// Réinitialiser le texte
 		loader.textContent = "";
 	}
 
-	async function loadAndRenderData() {
-		showLoader();
-
+	async function loadVotesAndRender() {
 		try {
-			const res = await fetch(`${BASE_URL}/votes`); // Remplace par ton endpoint
-			if (!res.ok) throw new Error("Erreur serveur");
+			// Afficher le loader immédiatement pour le premier chargement
+			if (isFirstLoad) {
+				showLoader();
+			} else {
+				// Pour les chargements suivants : afficher le loader après 1 seconde seulement si c’est long
+				loaderTimeout = setTimeout(() => {
+					showLoader("Mise à jour des résultats...");
+				}, 1000);
+			}
 
-			const data = await res.json();
+			const res = await fetch(`${BASE_URL}/votes`);
+			if (!res.ok) throw new Error("Erreur serveur");
+			const participants = await res.json();
+
+			// Cache le loader immédiatement si la réponse est rapide
+			clearTimeout(loaderTimeout);
 			hideLoader();
 
-			if (!data || data.length === 0) {
+			isFirstLoad = false; // On n’est plus sur le premier chargement
+
+			// --- Affichage ou message s’il n’y a pas de participants ---
+			if (!participants || participants.length === 0) {
+				resultList.style.listStyle = "none";
 				resultList.innerHTML =
-					"<li style='text-align:center;'>Aucun résultat trouvé</li>";
-				showMessage("Aucun résultat disponible.");
+					"<li style='text-align:center;'>Y a rien ici... comme dans mon estomac d'ailleurs...<br>À toi de remplir !<br><small class='nowrap-ellipsis'><em>(Pas mon estomac, mais après si t'insiste je dis pas non.)</em></small></li>";
+
+				// On vide aussi la légende si les participants sont absents
+				const legendDiv = document.querySelector(".vacances-legend");
+				if (legendDiv) {
+					legendDiv.innerHTML = "";
+				}
+
+				showMessage("Il manque absolument tout le monde 😪");
 				return;
 			}
 
-			createDateLegend();
-			renderResults(data);
-		} catch (error) {
-			hideLoader();
-			showMessage("Une erreur est survenue.");
-			console.error(error);
-		}
-	}
+			const legendDiv = document.querySelector(".vacances-legend");
+			if (legendDiv && legendDiv.innerHTML.trim() === "") {
+				createVacancesLegend();
+			}
 
-	function renderResults(data) {
-		let dates = document.querySelector(".participants-container");
-		if (dates) {
-			dates.remove();
-		}
+			// --- Traitement des votes manquants ---
+			const votedNames = participants.map((p) =>
+				p.userName.trim().toLowerCase()
+			);
+			const uniqueVotedNames = [...new Set(votedNames)];
+			const totalVotesExpected = users.reduce(
+				(acc, user) => acc + (user.maxVotes || 1),
+				0
+			);
+			const votesMissing = totalVotesExpected - uniqueVotedNames.length;
 
-		// 👉 Créer une nouvelle div
-		const participantsContainer = document.createElement("div");
-		participantsContainer.classList.add("participants-container");
+			// --- Affichage du message ---
+			messageContainer.innerHTML = ""; // On vide avant d'afficher un nouveau message
 
-		resultList.innerHTML = "";
+			if (votesMissing > 0) {
+				const message = document.createElement("p");
+				message.textContent = `Il manque encore ${votesMissing} ${
+					votesMissing > 1 ? "personnes" : "personne"
+				}.`;
+				message.style.color = "#fffff";
+				messageContainer.appendChild(message);
+			} else {
+				messageContainer.textContent = "Tout le monde a voté";
+			}
 
-		const dateCount = {};
-		data.forEach((item) => {
-			if (Array.isArray(item.selectedDates)) {
-				item.selectedDates.forEach((date) => {
+			// --- Calcul popularité des dates ---
+			const dateCount = {};
+			participants.forEach(({ selectedDates }) => {
+				selectedDates.forEach((date) => {
 					dateCount[date] = (dateCount[date] || 0) + 1;
 				});
-			} else {
-				console.warn("item.selectedDates n'est pas un tableau :", item);
-			}
-		});
+			});
 
-		const sortedDates = Object.entries(dateCount).sort((a, b) => b[1] - a[1]);
+			// --- Affichage résultats ---
+			const container = document.createElement("div");
+			container.classList.add("participants-container");
 
-		sortedDates.forEach(([date, count]) => {
-			const li = document.createElement("li");
-			const color = getDateColor(date);
+			participants.forEach(({ userName, selectedDates }) => {
+				const participantDiv = document.createElement("div");
+				participantDiv.classList.add("participant");
 
-			// Formatage de la date
-			const dateObj = new Date(date);
-			const day = String(dateObj.getDate()).padStart(2, "0");
-			const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-			const year = dateObj.getFullYear();
-			const formattedDate = `${day}/${month}/${year}`;
+				const h2 = document.createElement("h2");
+				h2.textContent = userName;
+				participantDiv.appendChild(h2);
 
-			li.textContent = `${formattedDate}`;
+				const p = document.createElement("p");
+				p.textContent = "Dates sélectionnées :";
+				participantDiv.appendChild(p);
 
-			if (color) {
-				li.style.color = color;
-			}
+				const ul = document.createElement("ul");
 
-			li.classList.add("participant");
-			participantsContainer.appendChild(li);
-		});
+				selectedDates.sort().forEach((dateStr) => {
+					const li = document.createElement("li");
 
-		// 👉 Ajouter la nouvelle div au DOM
-		resultList.appendChild(participantsContainer);
+					const dateObj = new Date(dateStr);
+					const yyyy = dateObj.getFullYear();
+					const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
+					const dd = String(dateObj.getDate()).padStart(2, "0");
+					const formatted = `${dd}/${mm}/${yyyy}`;
+					const dateOnlyStr = `${yyyy}-${mm}-${dd}`;
+					const color = getVacationColor(dateOnlyStr);
+					li.textContent = formatted;
+					if (color) {
+						li.style.setProperty("color", color, "important");
+						li.style.setProperty("font-weight", "bold", "important");
+					}
+					console.log("VACANCES COLOR POUR", formatted, "=>", color);
+
+					if (
+						participants.length > 1 &&
+						dateCount[dateStr] === participants.length
+					) {
+						li.classList.add("popular");
+						const span = document.createElement("span");
+						span.textContent = " Unanimité !";
+						li.appendChild(span);
+					}
+
+					ul.appendChild(li);
+				});
+
+				participantDiv.appendChild(ul);
+				container.appendChild(participantDiv);
+			});
+
+			resultList.innerHTML = "";
+			resultList.appendChild(container);
+		} catch (err) {
+			console.error("Erreur lors du chargement des votes :", err);
+			clearTimeout(loaderTimeout);
+			hideLoader();
+			showMessage(
+				"Erreur de chargement des résultats, je répare ça le plus vite possible !"
+			);
+		} finally {
+			clearTimeout(loaderTimeout);
+			hideLoader();
+		}
 	}
 
-	loadAndRenderData();
+	// Chargement initial
+	loadVotesAndRender();
+
+	// Rafraîchissement toutes les 5 secondes
+	setInterval(loadVotesAndRender, 5000);
 });
