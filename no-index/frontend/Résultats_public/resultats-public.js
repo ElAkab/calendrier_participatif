@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	};
 
 	function createDateLegend() {
-		const legendContainer = document.getElementById("legend");
+		const legendContainer = document.querySelector(".vacances-legend");
 		if (!legendContainer) return;
 
 		legendContainer.innerHTML = "";
@@ -130,6 +130,13 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	function renderResults(data) {
+		let dates = document.querySelector(".participants-container");
+		if (dates) {
+			dates.remove();
+		}
+		const participantsContainer = document.createElement("div");
+		participantsContainer.classList.add("participants-container");
+
 		resultList.innerHTML = "";
 
 		const dateCount = {};
@@ -157,6 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				li.style.borderRadius = "5px";
 				li.style.marginBottom = "5px";
 			}
+			li.classList.add;
 			resultList.appendChild(li);
 		});
 	}

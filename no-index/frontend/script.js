@@ -34,31 +34,11 @@ document.addEventListener("DOMContentLoaded", () => {
 	// Vérifie si utilisateur stocké en local
 	let storedName = localStorage.getItem("userName");
 
-	async function checkUserOnServer(name) {
-		try {
-			const res = await fetch(`${BASE_URL}/is-name-taken`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ name }),
-			});
-			if (!res.ok) throw new Error("Erreur réseau");
-			const data = await res.json();
-			return data.isTaken;
-		} catch (err) {
-			console.error("Erreur serveur:", err);
-			return false;
-		}
-	}
-
 	async function init() {
 		if (storedName) {
 			togglePage(true);
-			const exists = await checkUserOnServer(storedName);
+			storedName;
 			togglePage(false);
-			if (!exists) {
-				localStorage.removeItem("userName");
-				storedName = null;
-			}
 		}
 
 		if (storedName) {
@@ -92,23 +72,8 @@ document.addEventListener("DOMContentLoaded", () => {
 			return;
 		}
 
-		const existingName = localStorage.getItem("userName");
-		console.log("existingName in localStorage:", existingName);
-
-		if (existingName && typeof existingName !== "string") {
-			console.warn("Nom corrompu détecté dans le localStorage.");
-			localStorage.removeItem("userName");
-		}
-
 		togglePage(true);
 		message.textContent = "Vérification...";
-
-		const isTaken = await checkUserOnServer(cleanName);
-		if (isTaken) {
-			message.textContent = "Ce prénom est déjà utilisé.";
-			togglePage(false);
-			return;
-		}
 
 		// Enregistrer user côté serveur
 		try {
