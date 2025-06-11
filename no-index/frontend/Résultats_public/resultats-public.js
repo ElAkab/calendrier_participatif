@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let loaderInterval = null;
 
 	function showLoader(message = "Chargement en cours") {
-		const baseMessage = message;
+		let baseMessage = message;
 		let dotCount = 0;
 
 		loader.style.display = "block";
@@ -160,24 +160,44 @@ document.addEventListener("DOMContentLoaded", () => {
 			clearInterval(loaderInterval);
 		}
 
+		// Nettoyer un éventuel ancien timeout
+		if (loaderTimeout) {
+			clearTimeout(loaderTimeout);
+		}
+
 		// Démarrer l'animation des points
 		loaderInterval = setInterval(() => {
 			dotCount = (dotCount + 1) % 4; // 0, 1, 2, 3 => repart à 0
 			let dots = ".".repeat(dotCount);
 			loader.textContent = baseMessage + dots;
 		}, 1000);
+
+		// Après 5 secondes, afficher le message additionnel
+		loaderTimeout = setTimeout(() => {
+			// On ajoute un message sous le loader (par exemple dans un élément dédié)
+			let extraMessage = document.createElement("div");
+			extraMessage.textContent = "C'est toujours comme ça la première fois";
+			loader.parentNode.appendChild(extraMessage);
+		}, 5000);
+	}
+
+	function clearTimer(timer) {
+		if (timer) {
+			clearInterval(timer);
+			clearTimeout(timer);
+		}
+		return null; // Toujours remettre la référence à null
 	}
 
 	function hideLoader() {
+		// Cacher le loader
 		loader.style.display = "none";
 
-		// Arrêter l'animation
-		if (loaderInterval) {
-			clearInterval(loaderInterval);
-			loaderInterval = null;
-		}
+		// Arrêter l'animation et le délai
+		loaderInterval = clearTimer(loaderInterval);
+		loaderTimeout = clearTimer(loaderTimeout);
 
-		// Optionnel : remettre le message de base
+		// Réinitialiser le texte
 		loader.textContent = "";
 	}
 
