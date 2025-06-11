@@ -148,6 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	let isFirstLoad = true;
 	let loaderInterval = null;
+	let loaderTimeout = null;
 
 	function showLoader(message = "Chargement en cours") {
 		let baseMessage = message;
@@ -202,8 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	async function loadVotesAndRender() {
-		let loaderTimeout;
-
 		try {
 			// Afficher le loader immédiatement pour le premier chargement
 			if (isFirstLoad) {
