@@ -178,17 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
 				createDateLegend();
 			}
 
-			// --- Traitement des votes manquants ---
-			const votedNames = participants.map((p) =>
-				p.userName.trim().toLowerCase()
-			);
-			const uniqueVotedNames = [...new Set(votedNames)];
-			const totalVotesExpected = users.reduce(
-				(acc, user) => acc + (user.maxVotes || 1),
-				0
-			);
-			const votesMissing = totalVotesExpected - uniqueVotedNames.length;
-
 			// --- Affichage du message ---
 			messageContainer.innerHTML = ""; // On vide avant d'afficher un nouveau message
 
