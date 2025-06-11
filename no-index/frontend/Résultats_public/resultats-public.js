@@ -181,17 +181,6 @@ document.addEventListener("DOMContentLoaded", () => {
 			// --- Affichage du message ---
 			messageContainer.innerHTML = ""; // On vide avant d'afficher un nouveau message
 
-			if (votesMissing > 0) {
-				const message = document.createElement("p");
-				message.textContent = `Il manque encore ${votesMissing} ${
-					votesMissing > 1 ? "personnes" : "personne"
-				}.`;
-				message.style.color = "#fffff";
-				messageContainer.appendChild(message);
-			} else {
-				messageContainer.textContent = "Tout le monde a voté";
-			}
-
 			// --- Calcul popularité des dates ---
 			const dateCount = {};
 			participants.forEach(({ selectedDates }) => {
