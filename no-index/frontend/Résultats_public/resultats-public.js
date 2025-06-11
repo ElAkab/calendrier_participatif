@@ -216,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
 					const dd = String(dateObj.getDate()).padStart(2, "0");
 					const formatted = `${dd}/${mm}/${yyyy}`;
 					const dateOnlyStr = `${yyyy}-${mm}-${dd}`;
-					const color = getVacationColor(dateOnlyStr);
+					const color = getDateColor(dateOnlyStr);
 					li.textContent = formatted;
 					if (color) {
 						li.style.setProperty("color", color, "important");
