@@ -29,9 +29,32 @@ document.addEventListener("DOMContentLoaded", () => {
 		document.body.style.opacity = disabled ? "0.6" : "1";
 	}
 
+	let loaderInterval;
+	let dotCount = 0;
+
 	function showLoader(show) {
 		const loader = document.getElementById("loader");
-		if (loader) loader.style.display = show ? "block" : "none";
+
+		if (!loader) return; // Sécurité : si l'élément n'existe pas
+
+		if (show) {
+			loader.style.display = "block";
+
+			// Réinitialiser le compteur
+			dotCount = 0;
+
+			// Démarrer l'animation
+			loaderInterval = setInterval(() => {
+				dotCount = (dotCount + 1) % 4; // 0, 1, 2, 3
+				let dots = ".".repeat(dotCount);
+				loader.textContent = "Loading" + dots;
+			}, 500); // Un peu plus rapide que 1000ms pour un effet sympa
+		} else {
+			loader.style.display = "none";
+
+			// Arrêter l'animation
+			clearInterval(loaderInterval);
+		}
 	}
 
 	// Liste autorisée
@@ -169,16 +192,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		p.textContent = `Vérification`;
 
-		const timeoutId = setTimeout(() => {
-			p.textContent = `Bientôt fini promis !`;
-
-			setTimeout(() => {
-				p.textContent = `Wallah c'est vrai.`;
-			}, 4000);
-		}, 5000);
-
 		input.disabled = true;
 		btn.disabled = true;
+
+		// 🟢 Démarrage du message d'attente
+		let timeoutId = showMessages(p);
 
 		try {
 			const responseIsTaken = await fetch(`${BASE_URL}/is-name-taken`, {
@@ -223,15 +241,36 @@ document.addEventListener("DOMContentLoaded", () => {
 			nameMessage.textContent = "Erreur serveur. Réessaie plus tard.";
 			input.classList.add("invalid");
 		} finally {
-			// On annule le timeout si la requête s'est terminée avant 5s
 			clearTimeout(timeoutId);
-
 			talkingWheel.classList.remove("spin");
 			btn.disabled = false;
 			input.disabled = false;
 			input.focus();
 		}
 	});
+
+	// 🔄 Messages cycliques améliorés
+	function showMessages(p) {
+		let dotCount = 0;
+		let messages = [
+			"Bientôt fini promis !",
+			"Encore un peu...",
+			"Au pire tu peux actualiser...",
+		];
+		let index = 0;
+
+		p.textContent = "Vérification";
+
+		let timeoutId = setInterval(() => {
+			p.textContent = messages[index];
+			index++;
+			if (index >= messages.length) {
+				clearInterval(timeoutId);
+			}
+		}, 5000);
+
+		return timeoutId;
+	}
 
 	input.addEventListener("keydown", (event) => {
 		if (event.key === "Enter") {
@@ -297,12 +336,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 			const output = document.querySelector("#output");
 			if (output) output.textContent = "";
-		}, 100); // délai court pour laisser le temps au loader d'apparaître
 
-		// Recharge la page après une courte pause (optionnel, laisse le temps au loader de s'afficher visuellement)
-		setTimeout(() => {
-			location.reload();
-		}, 10);
+			// Recharger après affichage du modal nettoyé
+			setTimeout(() => location.reload(), 500); // Laisse le temps de voir le modal réapparaître
+		}, 100);
 	});
 });
 
