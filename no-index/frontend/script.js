@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			loaderInterval = setInterval(() => {
 				dotCount = (dotCount + 1) % 4; // 0, 1, 2, 3
 				let dots = ".".repeat(dotCount);
-				loader.textContent = "Loading" + dots;
+				loader.textContent = "Chargement" + dots;
 			}, 500); // Un peu plus rapide que 1000ms pour un effet sympa
 		} else {
 			loader.style.display = "none";
