@@ -175,10 +175,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		// Après 5 secondes, afficher le message additionnel
 		loaderTimeout = setTimeout(() => {
-			// On ajoute un message sous le loader (par exemple dans un élément dédié)
-			let extraMessage = document.createElement("div");
-			extraMessage.textContent = "C'est toujours comme ça la première fois";
-			loader.parentNode.appendChild(extraMessage);
+			document.getElementById("extraLoaderMessage").textContent =
+				"C'est toujours comme ça la première fois";
 		}, 5000);
 	}
 
@@ -200,6 +198,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		// Réinitialiser le texte
 		loader.textContent = "";
+
+		// Nettoyer les messages supplémentaires
+		document.getElementById("extraLoaderMessage").textContent = "";
 	}
 
 	async function loadVotesAndRender() {
@@ -307,10 +308,19 @@ document.addEventListener("DOMContentLoaded", () => {
 					const dateOnlyStr = `${yyyy}-${mm}-${dd}`;
 					const color = getVacationColor(dateOnlyStr);
 					li.textContent = formatted;
+
 					if (color) {
-						li.style.setProperty("color", color, "important");
-						li.style.setProperty("font-weight", "bold", "important");
+						const colorDot = document.createElement("span");
+						colorDot.style.display = "inline-block";
+						colorDot.style.borderRadius = "50%";
+						colorDot.style.backgroundColor = color;
+						colorDot.classList.add("vacances-legend-circle");
+						colorDot.style.marginLeft = "8px"; // un petit espace avec le texte
+
+						// On stocke la pastille pour potentiellement la retirer après
+						li.append(colorDot);
 					}
+
 					console.log("VACANCES COLOR POUR", formatted, "=>", color);
 
 					if (
@@ -320,6 +330,15 @@ document.addEventListener("DOMContentLoaded", () => {
 						li.classList.add("popular");
 						const span = document.createElement("span");
 						span.textContent = " Unanimité !";
+
+						if (color) {
+							// On supprime uniquement la pastille qu'on a créée
+							const colorDot = li.querySelector(".vacances-legend-circle");
+							if (colorDot) colorDot.remove();
+							li.style.setProperty("color", color, "important");
+							li.style.setProperty("font-weight", "bold", "important");
+						}
+
 						li.appendChild(span);
 					}
 
