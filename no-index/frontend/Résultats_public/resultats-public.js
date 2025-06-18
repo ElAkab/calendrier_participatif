@@ -68,17 +68,17 @@ document.addEventListener("DOMContentLoaded", () => {
 	};
 
 	const VACANCES_COLORS = {
-		"Vacances de Noël": "#1E90FF", // Bleu (Dodger Blue)
-		"Vacances de Carnaval": "#800080", // Violet (Purple)
-		"Vacances de Pâques": "#32CD32", // Vert (Lime Green)
-		"Vacances d'été": "#FFA500", // Orange
+		"Vacances de Noël": "#1E90FF",
+		"Vacances de Carnaval": "#800080",
+		"Vacances de Pâques": "#32CD32",
+		"Vacances d'été": "#FFA500",
 	};
 
 	function createVacancesLegend() {
 		const legendContainer = document.getElementById("vacancesLegend");
-		if (!legendContainer) return; // sécurité si absent
+		if (!legendContainer) return;
 
-		legendContainer.innerHTML = ""; // Vide le contenu
+		legendContainer.innerHTML = "";
 
 		for (const [vacName, color] of Object.entries(VACANCES_COLORS)) {
 			const legendItem = document.createElement("div");
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 			const colorBox = document.createElement("span");
 			colorBox.classList.add("vacances-legend-circle");
-			colorBox.style.backgroundColor = color; // couleur dynamique
+			colorBox.style.backgroundColor = color;
 
 			const label = document.createElement("span");
 			label.textContent = vacName;
@@ -168,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		// Démarrer l'animation des points
 		loaderInterval = setInterval(() => {
-			dotCount = (dotCount + 1) % 4; // 0, 1, 2, 3 => repart à 0
+			dotCount = (dotCount + 1) % 4;
 			let dots = ".".repeat(dotCount);
 			loader.textContent = baseMessage + dots;
 		}, 1000);
@@ -315,7 +315,7 @@ document.addEventListener("DOMContentLoaded", () => {
 						colorDot.style.borderRadius = "50%";
 						colorDot.style.backgroundColor = color;
 						colorDot.classList.add("vacances-legend-circle");
-						colorDot.style.marginLeft = "8px"; // un petit espace avec le texte
+						colorDot.style.marginLeft = "8px";
 
 						// On stocke la pastille pour potentiellement la retirer après
 						li.append(colorDot);

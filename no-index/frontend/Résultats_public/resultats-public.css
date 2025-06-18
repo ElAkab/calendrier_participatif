@@ -41,14 +41,14 @@ h1 {
 	flex-wrap: wrap;
 	justify-content: center;
 	gap: 20px;
-	justify-content: center; /* centre le grid dans le container */
-	justify-items: stretch; /* chaque participant remplit sa cellule */
+	justify-content: center;
+	justify-items: stretch;
 	width: 100%;
 	max-width: 1400px;
 	margin: 0 auto;
 	padding: 0 1rem;
 	box-sizing: border-box;
-	align-items: flex-start; /* <-- important pour garder hauteurs indépendantes */
+	align-items: flex-start;
 }
 
 .participant {
@@ -57,7 +57,7 @@ h1 {
 	border-radius: 10px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
 	max-width: 320px;
-	min-width: 280px; /* évite que ça devienne trop étroit */
+	min-width: 280px;
 	align-items: start;
 	width: 100%;
 	box-sizing: border-box;
@@ -91,7 +91,7 @@ h1 {
 .participant h2 {
 	text-align: center;
 	margin-bottom: 8px;
-	color: #000; /* rappel de Ma couleur de dégradé */
+	color: #000;
 }
 
 .participant p {
@@ -146,7 +146,7 @@ li span {
 	color: white;
 	padding: 10px;
 	text-align: center;
-	z-index: 1000; /* Le message est au-dessus de tout */
+	z-index: 1000;
 	font-size: 1rem;
 	font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
 	box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
@@ -184,15 +184,15 @@ li span {
 .nowrap-ellipsis {
 	font-size: 0.6rem;
 	white-space: nowrap; /* Empêche le retour à la ligne */
-	overflow: hidden; /* Coupe le texte qui dépasse */
+	overflow: hidden;
 	text-overflow: ellipsis; /* Affiche "..." pour le texte coupé */
 }
 
 .vacances-legend {
-	position: fixed; /* fixe la légende */
-	top: 0; /* en haut de la page */
+	position: fixed;
+	top: 0;
 	left: 0;
-	right: 0; /* pour prendre toute la largeur */
+	right: 0;
 	width: 100vw;
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);

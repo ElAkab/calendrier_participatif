@@ -32,10 +32,10 @@ const VACANCES = {
 };
 
 const VACANCES_COLORS = {
-	"Vacances de Noël": "#1E90FF", // Bleu (Dodger Blue)
-	"Vacances de Carnaval": "#800080", // Violet (Purple)
-	"Vacances de Pâques": "#32CD32", // Vert (Lime Green)
-	"Vacances d'été": "#FFA500", // Orange
+	"Vacances de Noël": "#1E90FF",
+	"Vacances de Carnaval": "#800080",
+	"Vacances de Pâques": "#32CD32",
+	"Vacances d'été": "#FFA500",
 };
 
 // Affichage des dates sélectionnées
@@ -65,7 +65,7 @@ if (savedDates.length === 0) {
 }
 
 function getVacationColorForDate(dateString) {
-	const current = normalizeDate(new Date(dateString)).getTime(); // timestamp
+	const current = normalizeDate(new Date(dateString)).getTime();
 	for (const [name, ranges] of Object.entries(VACANCES)) {
 		for (const [start, end] of ranges) {
 			const from = normalizeDate(new Date(start)).getTime();
