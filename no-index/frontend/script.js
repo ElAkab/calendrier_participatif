@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			loaderInterval = setInterval(() => {
 				dotCount = (dotCount + 1) % 4; // 0, 1, 2, 3
 				let dots = ".".repeat(dotCount);
-				loader.textContent = "Chargement" + dots;
+				loader.textContent = " ⏳ Chargement" + dots;
 			}, 500); // Un peu plus rapide que 1000ms pour un effet sympa
 		} else {
 			loader.style.display = "none";
@@ -807,7 +807,6 @@ function renderCalendar() {
 	updateHolidayName();
 }
 
-// Ajout des gestionnaires d'événements pour les dates
 function addDateClickHandlers() {
 	document.querySelectorAll(".dates li:not(.inactive)").forEach((li) => {
 		li.addEventListener("click", () => {
@@ -823,6 +822,12 @@ function addDateClickHandlers() {
 			}
 
 			localStorage.setItem("selectedDates", JSON.stringify(selectedDates));
+
+			// Met à jour le compteur après chaque sélection
+			output.textContent = `Tu as sélectionné ${selectedDates.length} date${
+				selectedDates.length > 1 ? "s" : ""
+			}`;
+
 			updateValidateButton();
 		});
 	});
@@ -916,7 +921,7 @@ validateBtn?.addEventListener("click", () => {
 	validateLabel.style.pointerEvents = "none";
 	validateLabel.style.cursor = "not-allowed";
 
-	output.textContent = selectedDates.length + " Dates sélectionnées : ";
+	output.textContent = selectedDates.length + " dates sélectionnées.";
 
 	const dataToSend = {
 		userName: userName,

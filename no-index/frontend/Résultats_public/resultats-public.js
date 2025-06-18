@@ -223,7 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			clearTimeout(loaderTimeout);
 			hideLoader();
 
-			isFirstLoad = false; // On n’est plus sur le premier chargement
+			isFirstLoad = false;
 
 			// --- Affichage ou message s’il n’y a pas de participants ---
 			if (!participants || participants.length === 0) {
@@ -258,7 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			const votesMissing = totalVotesExpected - uniqueVotedNames.length;
 
 			// --- Affichage du message ---
-			messageContainer.innerHTML = ""; // On vide avant d'afficher un nouveau message
+			messageContainer.innerHTML = "";
 
 			if (votesMissing > 0) {
 				const message = document.createElement("p");
