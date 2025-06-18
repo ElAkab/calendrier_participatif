@@ -431,7 +431,7 @@ const months = [
 
 const VACANCES_2025 = [
 	{
-		nom: "Vacances d'hiver (Noël)",
+		nom: "Vacances de Noël",
 		debut: "2024-12-21",
 		fin: "2025-01-04",
 	},
@@ -441,7 +441,7 @@ const VACANCES_2025 = [
 		fin: "2025-03-09",
 	},
 	{
-		nom: "Vacances de printemps (Pâques)",
+		nom: "Vacances de Pâques",
 		debut: "2025-04-28",
 		fin: "2025-05-11",
 	},
@@ -454,7 +454,7 @@ const VACANCES_2025 = [
 
 const VACANCES_2026 = [
 	{
-		nom: "Vacances d'hiver (Noël)",
+		nom: "Vacances de Noël",
 		debut: "2025-12-27",
 		fin: "2026-01-01",
 	},
@@ -464,7 +464,7 @@ const VACANCES_2026 = [
 		fin: "2026-02-27",
 	},
 	{
-		nom: "Vacances de printemps (Pâques)",
+		nom: "Vacances de Pâques",
 		debut: "2026-04-27",
 		fin: "2026-05-10",
 	},
@@ -477,7 +477,7 @@ const VACANCES_2026 = [
 
 const VACANCES_2027 = [
 	{
-		nom: "Vacances d'hiver (Noël)",
+		nom: "Vacances de Noël",
 		debut: "2026-12-27",
 		fin: "2027-01-03",
 	},
@@ -487,7 +487,7 @@ const VACANCES_2027 = [
 		fin: "2027-02-21",
 	},
 	{
-		nom: "Vacances de printemps (Pâques)",
+		nom: "Vacances de Pâques",
 		debut: "2027-04-03",
 		fin: "2027-04-18",
 	},
@@ -500,7 +500,7 @@ const VACANCES_2027 = [
 
 const VACANCES_2028 = [
 	{
-		nom: "Vacances d'hiver (Noël)",
+		nom: "Vacances de Noël",
 		debut: "2027-12-25",
 		fin: "2028-01-02",
 	},
@@ -510,7 +510,7 @@ const VACANCES_2028 = [
 		fin: "2028-03-05",
 	},
 	{
-		nom: "Vacances de printemps (Pâques)",
+		nom: "Vacances de Pâques",
 		debut: "2028-03-25",
 		fin: "2028-04-09",
 	},
@@ -522,9 +522,9 @@ const VACANCES_2028 = [
 ];
 
 const VACANCES_COLORS = {
-	"Vacances d'hiver (Noël)": "#1E90FF", // Bleu
+	"Vacances de Noël": "#1E90FF", // Bleu
 	"Vacances de Carnaval": "#800080", // Rose
-	"Vacances de printemps (Pâques)": "#32CD32", // Vert
+	"Vacances de Pâques": "#32CD32", // Vert
 	"Vacances d'été": "#FFA500", // Orange
 };
 

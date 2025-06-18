@@ -5,7 +5,7 @@ document.querySelector("h1").textContent = "Nickel " + userName + " !";
 
 const savedDates = JSON.parse(localStorage.getItem("selectedDates")) || [];
 const VACANCES = {
-	"Vacances d'hiver (Noël)": [
+	"Vacances de Noël": [
 		["2024-12-24", "2025-01-05"],
 		["2025-12-22", "2026-01-04"],
 		["2026-12-21", "2027-01-01"],
@@ -17,7 +17,7 @@ const VACANCES = {
 		["2027-02-15", "2027-02-21"],
 		["2028-02-25", "2028-03-05"],
 	],
-	"Vacances de printemps (Pâques)": [
+	"Vacances de Pâques": [
 		["2025-04-28", "2025-05-11"],
 		["2026-04-27", "2026-05-10"],
 		["2027-04-05", "2027-04-18"],
@@ -32,9 +32,9 @@ const VACANCES = {
 };
 
 const VACANCES_COLORS = {
-	"Vacances d'hiver (Noël)": "#1E90FF", // Bleu (Dodger Blue)
+	"Vacances de Noël": "#1E90FF", // Bleu (Dodger Blue)
 	"Vacances de Carnaval": "#800080", // Violet (Purple)
-	"Vacances de printemps (Pâques)": "#32CD32", // Vert (Lime Green)
+	"Vacances de Pâques": "#32CD32", // Vert (Lime Green)
 	"Vacances d'été": "#FFA500", // Orange
 };
 

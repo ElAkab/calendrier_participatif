@@ -90,8 +90,8 @@ h1 {
 
 .participant h2 {
 	text-align: center;
-	margin-bottom: 10px;
-	color: #110055; /* rappel de Ma couleur de dégradé */
+	margin-bottom: 8px;
+	color: #000; /* rappel de Ma couleur de dégradé */
 }
 
 .participant p {
