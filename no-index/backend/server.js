@@ -286,6 +286,16 @@ app.get("/resultats.html", (req, res) => {
 	res.sendFile(path.join(__dirname, "..", "frontend", "resultats.html"));
 });
 
+app.get("/api/ping", async (req, res) => {
+	try {
+		await pool.query("SELECT 1");
+		res.status(200).send("Pong");
+	} catch (err) {
+		console.error("Erreur ping :", err);
+		res.status(500).send("Erreur serveur");
+	}
+});
+
 // --- Lancement du serveur ---
 app.listen(PORT, () => {
 	console.log(`Serveur démarré sur le port ${PORT}`);
