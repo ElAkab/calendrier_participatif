@@ -20,8 +20,8 @@ const participants = [];
 const votesByDate = {};
 
 const allowedOrigins = [
-	"https://calendrier-participatif-public.onrender.com/",
-	"https://jour-j-calendry.netlify.app/",
+	"https://calendrier-participatif-public.onrender.com",
+	"https://jour-j-calendry.netlify.app",
 	"http://localhost:3000",
 	"http://127.0.0.1:5500",
 ];
@@ -38,7 +38,6 @@ app.use(
 	})
 );
 
-app.use(cors());
 app.use(express.json());
 
 // Sert les fichiers statiques (HTML, CSS, JS)
