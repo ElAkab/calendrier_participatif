@@ -251,10 +251,10 @@ const VACANCES_2028 = [
 ];
 
 const VACANCES_COLORS = {
-	"Vacances d'hiver (Noël)": "#1E90FF", // Bleu
-	"Vacances de Carnaval": "#800080", // Rose
-	"Vacances de printemps (Pâques)": "#32CD32", // Vert
-	"Vacances d'été": "#FFA500", // Orange
+	"Vacances de Noël": "#1E90FF",
+	"Vacances de Carnaval": "#800080",
+	"Vacances de Pâques": "#32CD32",
+	"Vacances d'été": "#FFA500",
 };
 
 let date = new Date();

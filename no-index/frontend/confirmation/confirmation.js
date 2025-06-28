@@ -32,10 +32,10 @@ const VACANCES = {
 };
 
 const VACANCES_COLORS = {
-	"Vacances d'hiver (Noël)": "#1E90FF", // Bleu (Dodger Blue)
-	"Vacances de Carnaval": "#800080", // Violet (Purple)
-	"Vacances de printemps (Pâques)": "#32CD32", // Vert (Lime Green)
-	"Vacances d'été": "#FFA500", // Orange
+	"Vacances de Noël": "#1E90FF",
+	"Vacances de Carnaval": "#800080",
+	"Vacances de Pâques": "#32CD32",
+	"Vacances d'été": "#FFA500",
 };
 
 // Affichage des dates sélectionnées
