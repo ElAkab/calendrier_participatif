@@ -77,6 +77,24 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	}
 
+	function updateGridColumns() {
+		const legend = document.querySelector(".vacances-legend");
+		if (!legend) return;
+
+		// Récupérer le nombre réel de colonnes dans la grille CSS
+		const computedStyle = getComputedStyle(legend);
+		const columns = computedStyle
+			.getPropertyValue("grid-template-columns")
+			.split(" ").length;
+
+		// On met ce nombre dans une variable CSS
+		legend.style.setProperty("--columns-count", columns);
+	}
+
+	// Appelle cette fonction au chargement et au resize
+	window.addEventListener("load", updateGridColumns);
+	window.addEventListener("resize", updateGridColumns);
+
 	function isDateInRange(dateStr, startStr, endStr) {
 		const date = new Date(dateStr);
 		const start = new Date(startStr);
