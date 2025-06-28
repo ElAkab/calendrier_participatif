@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const BASE_URL =
 		window.location.hostname === "localhost" ||
 		window.location.hostname === "127.0.0.1"
-			? "http://localhost:3000"
+			? "http://localhost:4000"
 			: "https://calendrier-participatif-public.onrender.com";
 
 	// Exemple de plages avec leurs couleurs
@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		return null;
 	}
 
-	function showMessage(text, duration = 3000) {
+	function showMessage(text, duration = 4000) {
 		messageContainer.textContent = text;
 		messageContainer.classList.add("show");
 		setTimeout(() => {

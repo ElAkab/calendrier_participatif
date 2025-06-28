@@ -25,166 +25,167 @@
 		<button id="clear">Réinitialiser</button>
 
 		<script>
-			// Protection simple avec mot de passe admin
-			if (prompt("Mot de passe admin :") !== "mdpSecret") {
-				alert("Accès refusé");
-				document.body.innerHTML = ""; // Vide la page
-			}
-
-			const BASE_URL =
-				window.location.hostname === "localhost" ||
-				window.location.hostname === "127.0.0.1"
-					? "http://localhost:3000"
-					: "https://calendrier-participatif-public.onrender.com";
-
-			const list = document.getElementById("results");
-
-			function formatDate(dateStr) {
-				const date = new Date(dateStr);
-				if (isNaN(date)) return dateStr; // Si la date est invalide
-
-				const day = String(date.getDate()).padStart(2, "0");
-				const month = String(date.getMonth() + 1).padStart(2, "0"); // Mois commence à 0
-				const year = date.getFullYear();
-
-				return `${day}/${month}/${year}`;
-			}
-
-			// ✅ Factorisation dans une fonction pour pouvoir la rappeler
-			function loadResults() {
-				list.innerHTML = "";
-
-				fetch(`${BASE_URL}/votes`)
-					.then((res) => res.json())
-					.then((data) => {
-						if (data.length === 0) {
-							list.innerHTML = "<li>Aucun participant trouvé.</li>";
-							return;
+						// Protection simple avec mot de passe admin
+						if (prompt("Mot de passe admin :") !== "mdpSecret") {
+							alert("Accès refusé");
+							document.body.innerHTML = ""; // Vide la page
 						}
 
-						data.forEach((entry) => {
-							const li = document.createElement("li");
+						const BASE_URL =
+							window.location.hostname === "localhost" ||
+							window.location.hostname === "127.0.0.1"
+								? "http://localhost:4000
+			"
+								: "https://calendrier-participatif-public.onrender.com";
 
-							const formattedDates = entry.selectedDates.map((dateStr) => {
-								const formatted = formatDate(dateStr);
+						const list = document.getElementById("results");
 
-								if (entry.popularDates.includes(dateStr)) {
-									return `<span style="color: green; font-weight: bold;">${formatted}</span>`;
+						function formatDate(dateStr) {
+							const date = new Date(dateStr);
+							if (isNaN(date)) return dateStr; // Si la date est invalide
+
+							const day = String(date.getDate()).padStart(2, "0");
+							const month = String(date.getMonth() + 1).padStart(2, "0"); // Mois commence à 0
+							const year = date.getFullYear();
+
+							return `${day}/${month}/${year}`;
+						}
+
+						// ✅ Factorisation dans une fonction pour pouvoir la rappeler
+						function loadResults() {
+							list.innerHTML = "";
+
+							fetch(`${BASE_URL}/votes`)
+								.then((res) => res.json())
+								.then((data) => {
+									if (data.length === 0) {
+										list.innerHTML = "<li>Aucun participant trouvé.</li>";
+										return;
+									}
+
+									data.forEach((entry) => {
+										const li = document.createElement("li");
+
+										const formattedDates = entry.selectedDates.map((dateStr) => {
+											const formatted = formatDate(dateStr);
+
+											if (entry.popularDates.includes(dateStr)) {
+												return `<span style="color: green; font-weight: bold;">${formatted}</span>`;
+											}
+											return formatted;
+										});
+
+										li.innerHTML = `${entry.userName} → ${formattedDates.join(
+											" | "
+										)}`;
+										list.appendChild(li);
+									});
+								})
+								.catch((err) => {
+									console.error("Erreur :", err);
+									list.innerHTML =
+										"<li>Erreur lors du chargement des données. Je répare ça le plus vite possible !</li>" +
+										err;
+								});
+						}
+
+						// 🔁 Chargement initial
+						loadResults();
+
+						// 🔁 Réinitialisation globale
+						const clearBtn = document.getElementById("clear");
+						if (clearBtn) {
+							clearBtn.addEventListener("click", () => {
+								if (
+									confirm(
+										"Supprimer TOUTES les données du serveur ET réinitialiser l'affichage ?"
+									)
+								) {
+									fetch(`${BASE_URL}/clear`, { method: "DELETE" })
+										.then((res) => {
+											if (res.ok) {
+												alert("Données supprimées !");
+												loadResults();
+
+												// Réinitialisation locale
+												document
+													.querySelectorAll(".dates li.selected")
+													.forEach((li) => li.classList.remove("selected"));
+
+												localStorage.removeItem("selectedDates");
+												localStorage.removeItem("votesByDate");
+
+												const nameInput = document.getElementById("userNameInput");
+												if (nameInput) nameInput.value = "";
+
+												const output = document.getElementById("output");
+												if (output) output.innerHTML = "";
+											} else {
+												alert("Erreur serveur");
+											}
+										})
+										.catch((err) => {
+											console.error(err);
+											alert(
+												"Erreur de connexion au serveur. Je répare ça le plus vite possible !"
+											);
+										});
 								}
-								return formatted;
 							});
+						}
 
-							li.innerHTML = `${entry.userName} → ${formattedDates.join(
-								" | "
-							)}`;
-							list.appendChild(li);
-						});
-					})
-					.catch((err) => {
-						console.error("Erreur :", err);
-						list.innerHTML =
-							"<li>Erreur lors du chargement des données. Je répare ça le plus vite possible !</li>" +
-							err;
-					});
-			}
+						function resetVotes() {
+							if (confirm("⚠️ Es-tu sûr de vouloir supprimer tous les votes ?")) {
+								fetch(`${BASE_URL}/clear`, {
+									method: "DELETE",
+								})
+									.then((res) => {
+										if (!res.ok) throw new Error("Erreur lors de la suppression.");
+										return res.text();
+									})
+									.then((msg) => {
+										alert("✅ Données supprimées !");
+										// Recharge la page pour afficher les résultats vides
+										location.reload();
+									})
+									.catch((err) => {
+										alert(
+											"❌ Une erreur est survenue : " +
+												err.message +
+												"Je répare ça le plus vite possible !"
+										);
+									});
+							}
+						}
 
-			// 🔁 Chargement initial
-			loadResults();
+						// 🔁 Suppression d'un participant
+						const deleteBtn = document.getElementById("deleteUserBtn");
+						if (deleteBtn) {
+							deleteBtn.addEventListener("click", () => {
+								const name = document.getElementById("deleteNameInput").value.trim();
+								if (!name) return alert("Veuillez entrer un prénom.");
 
-			// 🔁 Réinitialisation globale
-			const clearBtn = document.getElementById("clear");
-			if (clearBtn) {
-				clearBtn.addEventListener("click", () => {
-					if (
-						confirm(
-							"Supprimer TOUTES les données du serveur ET réinitialiser l'affichage ?"
-						)
-					) {
-						fetch(`${BASE_URL}/clear`, { method: "DELETE" })
-							.then((res) => {
-								if (res.ok) {
-									alert("Données supprimées !");
-									loadResults();
-
-									// Réinitialisation locale
-									document
-										.querySelectorAll(".dates li.selected")
-										.forEach((li) => li.classList.remove("selected"));
-
-									localStorage.removeItem("selectedDates");
-									localStorage.removeItem("votesByDate");
-
-									const nameInput = document.getElementById("userNameInput");
-									if (nameInput) nameInput.value = "";
-
-									const output = document.getElementById("output");
-									if (output) output.innerHTML = "";
-								} else {
-									alert("Erreur serveur");
+								if (confirm(`Supprimer toutes les données associées à "${name}" ?`)) {
+									fetch(`${BASE_URL}/delete-user/${encodeURIComponent(name)}`, {
+										method: "DELETE",
+									})
+										.then((res) => {
+											if (res.ok) {
+												alert(`Le participant "${name}" a été supprimé.`);
+												loadResults();
+											} else {
+												alert("Aucun utilisateur trouvé ou erreur serveur.");
+											}
+										})
+										.catch((err) => {
+											console.error(err);
+											alert(
+												"Erreur lors de la suppression. Je répare ça le plus vite possible !"
+											);
+										});
 								}
-							})
-							.catch((err) => {
-								console.error(err);
-								alert(
-									"Erreur de connexion au serveur. Je répare ça le plus vite possible !"
-								);
 							});
-					}
-				});
-			}
-
-			function resetVotes() {
-				if (confirm("⚠️ Es-tu sûr de vouloir supprimer tous les votes ?")) {
-					fetch(`${BASE_URL}/clear`, {
-						method: "DELETE",
-					})
-						.then((res) => {
-							if (!res.ok) throw new Error("Erreur lors de la suppression.");
-							return res.text();
-						})
-						.then((msg) => {
-							alert("✅ Données supprimées !");
-							// Recharge la page pour afficher les résultats vides
-							location.reload();
-						})
-						.catch((err) => {
-							alert(
-								"❌ Une erreur est survenue : " +
-									err.message +
-									"Je répare ça le plus vite possible !"
-							);
-						});
-				}
-			}
-
-			// 🔁 Suppression d'un participant
-			const deleteBtn = document.getElementById("deleteUserBtn");
-			if (deleteBtn) {
-				deleteBtn.addEventListener("click", () => {
-					const name = document.getElementById("deleteNameInput").value.trim();
-					if (!name) return alert("Veuillez entrer un prénom.");
-
-					if (confirm(`Supprimer toutes les données associées à "${name}" ?`)) {
-						fetch(`${BASE_URL}/delete-user/${encodeURIComponent(name)}`, {
-							method: "DELETE",
-						})
-							.then((res) => {
-								if (res.ok) {
-									alert(`Le participant "${name}" a été supprimé.`);
-									loadResults();
-								} else {
-									alert("Aucun utilisateur trouvé ou erreur serveur.");
-								}
-							})
-							.catch((err) => {
-								console.error(err);
-								alert(
-									"Erreur lors de la suppression. Je répare ça le plus vite possible !"
-								);
-							});
-					}
-				});
-			}
+						}
 		</script>
 	</body>
 </html>

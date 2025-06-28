@@ -14,7 +14,7 @@ const pool = new Pool({
 });
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 const participants = [];
 const votesByDate = {};
@@ -22,7 +22,7 @@ const votesByDate = {};
 const allowedOrigins = [
 	"https://calendrier-participatif-public.onrender.com/",
 	"https://jour-j-calendry.netlify.app/",
-	"http://localhost:3000",
+	"http://localhost:4000",
 	"http://127.0.0.1:5500",
 ];
 
