@@ -216,12 +216,21 @@ document.addEventListener("DOMContentLoaded", () => {
 					const dd = String(dateObj.getDate()).padStart(2, "0");
 					const formatted = `${dd}/${mm}/${yyyy}`;
 					const dateOnlyStr = `${yyyy}-${mm}-${dd}`;
-					const color = getDateColor(dateOnlyStr);
+					const color = getVacationColor(dateOnlyStr);
 					li.textContent = formatted;
+
 					if (color) {
-						li.style.setProperty("color", color, "important");
-						li.style.setProperty("font-weight", "bold", "important");
+						const colorDot = document.createElement("span");
+						colorDot.style.display = "inline-block";
+						colorDot.style.borderRadius = "50%";
+						colorDot.style.backgroundColor = color;
+						colorDot.classList.add("vacances-legend-circle");
+						colorDot.style.marginLeft = "8px";
+
+						// On stocke la pastille pour potentiellement la retirer après
+						li.append(colorDot);
 					}
+
 					console.log("VACANCES COLOR POUR", formatted, "=>", color);
 
 					if (
@@ -231,6 +240,15 @@ document.addEventListener("DOMContentLoaded", () => {
 						li.classList.add("popular");
 						const span = document.createElement("span");
 						span.textContent = " Unanimité !";
+
+						if (color) {
+							// On supprime uniquement la pastille qu'on a créée
+							const colorDot = li.querySelector(".vacances-legend-circle");
+							if (colorDot) colorDot.remove();
+							li.style.setProperty("color", color, "important");
+							li.style.setProperty("font-weight", "bold", "important");
+						}
+
 						li.appendChild(span);
 					}
 
