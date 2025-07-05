@@ -270,6 +270,18 @@ app.delete("/delete-user/:userName", async (req, res) => {
 	}
 });
 
+// --- Route health check pour garder la base éveillée ---
+app.get("/health", async (req, res) => {
+	try {
+		// simple requête légère pour "réveiller" Neon
+		await pool.query("SELECT 1");
+		res.status(200).json({ status: "OK", message: "Database is awake" });
+	} catch (error) {
+		console.error("Health check failed:", error);
+		res.status(500).json({ status: "FAIL", message: "Database unreachable" });
+	}
+});
+
 // --- Lancement du serveur ---
 app.listen(PORT, () => {
 	console.log(`Serveur démarré sur le port ${PORT}`);
