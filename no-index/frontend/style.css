@@ -266,6 +266,7 @@ h1 {
 	flex-wrap: nowrap;
 	gap: 5px;
 	margin-top: 30px;
+	margin-bottom: 20px;
 	overflow-x: auto; /* Permet le scroll si nécessaire */
 }
 
